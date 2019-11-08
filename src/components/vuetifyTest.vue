@@ -518,12 +518,11 @@ import { mapGetters, mapActions } from "vuex"
 							MODTIME: new Date().toLocaleString()
 						}
 			this.sprintdialog.pretask.forEach(tk => {
-				console.log(tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1)
 				newtask.TASKID = (tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1).toString()
 				newtask.NAME = tk.NAME
 				newtask.OWNER = tk.OWNER
 				newtask.PRIORITY = tk.PRIORITY
-				this.list.task.push(newtask)
+				this.list.task.push(Object.assign({}, newtask))
 			})
 			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
 			this.sprintdialog = {open: false, prename: "", pretask: [{PRIORITY: 2}]}
