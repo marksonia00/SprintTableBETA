@@ -247,12 +247,12 @@
 									<v-col cols="6" sm="2" md="2">
 										<v-text-field label="Total pt*" type="number" v-model="dialog.task.TOTALPOINT" required></v-text-field>
 									</v-col>
-									<v-col cols="12" sm="6" md="4">
-										<v-select label="Owner*" 
+									<v-col cols="12" sm="6" md="4"> <!-- AUTOcomplete !!! -->
+										<v-autocomplete label="Owner*" 
 													:items="Array.from(list.member)" 
 													:rules="[v => !!v || 'Owner is required']"
 													v-model="dialog.task.OWNER">
-										</v-select>
+										</v-autocomplete>
 									</v-col>
 									<v-col cols="12" sm="6" md="4">
 										<v-select label="Priority" 
@@ -260,7 +260,14 @@
 													item-value="value"
 													:items="list.prior"
 													v-model="dialog.task.PRIORITY"	
-										></v-select>									
+										>
+										<template v-slot:item="{ item, index }">
+											<span :style="{color: `${item.color}`}">{{item.name}}</span>
+										</template>	
+										<template v-slot:selection="{ item, index }">										
+											<span :style="{color: `${item.color}`}">{{item.name}}</span>
+										</template>
+										</v-select>									
 									</v-col>
 									<v-col cols="12" sm="6" md="4">
 										<v-select label="Status" 
