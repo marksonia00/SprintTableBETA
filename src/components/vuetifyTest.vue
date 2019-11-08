@@ -248,11 +248,22 @@
 										<v-text-field label="Total pt*" type="number" v-model="dialog.task.TOTALPOINT" required></v-text-field>
 									</v-col>
 									<v-col cols="12" sm="6" md="4"> <!-- AUTOcomplete !!! -->
-										<v-autocomplete label="Owner*" 
-													:items="Array.from(list.member)" 
+										<v-select label="Owner*" 
+													:items="list.member" 
 													:rules="[v => !!v || 'Owner is required']"
 													v-model="dialog.task.OWNER">
-										</v-autocomplete>
+											<template v-slot:prepend-item>
+												<v-list-item>	
+													<v-text-field
+														label="New Member" 
+														v-model="edit.value" 
+														append-outer-icon="mdi-plus"
+														@click:append-outer="list.member.push(edit.value)"
+														dense>
+													</v-text-field>
+												</v-list-item>	
+											</template>
+										</v-select>
 									</v-col>
 									<v-col cols="12" sm="6" md="4">
 										<v-select label="Priority" 
@@ -357,10 +368,21 @@
 									</v-col>
 									<v-col cols="3">
 										<v-select label="Owner*" 
-													:items="Array.from(list.member)" 
+													:items="list.member" 
 													:rules="[v => !!v || 'required']"
-													v-model="task.OWNER"										
-										></v-select>									
+													v-model="task.OWNER">
+											<template v-slot:prepend-item>
+												<v-list-item>	
+													<v-text-field
+														label="New Member" 
+														v-model="edit.value" 
+														append-outer-icon="mdi-plus"
+														@click:append-outer="list.member.push(edit.value)"
+														dense>
+													</v-text-field>
+												</v-list-item>	
+											</template>									
+										</v-select>									
 									</v-col>
 									<v-col cols="3">
 										<v-select label="Priority" 
@@ -370,7 +392,14 @@
 													v-model="task.PRIORITY"	
 													:append-outer-icon="tid == 0 ? 'mdi-plus' : 'mdi-minus'"
 													@click:append-outer="tid == 0 ? sprintdialog.pretask.push({PRIORITY: 2}) : sprintdialog.pretask.splice(tid, 1)"
-										></v-select>										
+										>
+											<template v-slot:item="{ item, index }">
+												<span :style="{color: `${item.color}`}">{{item.name}}</span>
+											</template>	
+											<template v-slot:selection="{ item, index }">										
+												<span :style="{color: `${item.color}`}">{{item.name}}</span>
+											</template>
+										</v-select>										
 									</v-col>
 								</v-row>																	
 							</v-form>
@@ -597,7 +626,7 @@ import { mapGetters, mapActions } from "vuex"
 			this.list.task = getList
 			// console.log(this.list.task)
 			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
-			this.list.member = new Set(this.list.task.map(task => task.OWNER.trim()).sort())
+			this.list.member = Array.from(new Set(this.list.task.map(task => task.OWNER.trim()).sort()))
 			this.title.extend = true
 			
 			this.list.state = [
