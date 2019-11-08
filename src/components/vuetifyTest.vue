@@ -13,10 +13,20 @@
 						{{state.name}}
 					</div>
 				</v-col>
+				<v-spacer></v-spacer> <!-- SPACER HERE !!! -->
 			</v-row>
 			<v-tooltip left v-if="title.page == 1">  
 				<template v-slot:activator="{ on }">
-					<v-btn v-on="on" color="light-green accent-4" class="mr-4 white--text" absolute fab top right><v-icon>mdi-plus</v-icon></v-btn>
+					<v-btn v-on="on"
+							@click="sprintdialog.open = true"
+							color="light-green accent-4" 
+							class="mr-4 white--text" 
+							absolute 
+							fab 
+							top 
+							right>
+							<v-icon>mdi-plus</v-icon>
+					</v-btn>
 				</template>
 				<span>Add Sprint</span>
 			</v-tooltip>
@@ -69,7 +79,7 @@
 						<v-tooltip top>  
 							<template v-slot:activator="{ on }">
 								<v-btn text icon v-on="on" @click="edit.sprint == null ? edit = {sprint: sprint, value: sprint} : edit.sprint = null">							
-									<v-icon v-if="edit.sprint != sprint" color="brown darken-1">mdi-pencil-plus</v-icon>
+									<v-icon v-if="edit.sprint != sprint" color="brown darken-1">mdi-pencil</v-icon>
 									<v-icon v-else color="red darken-1">mdi-close</v-icon>
 								</v-btn>
 							</template>
@@ -95,27 +105,30 @@
 							</template>
 							<span>New Task</span>
 						</v-tooltip>
-						<v-spacer></v-spacer>
+						<v-spacer></v-spacer> <!-- SPACER HERE !!!  -->
+						<!--● Seal Sprint ●-->
 						<v-tooltip top>  
 							<template v-slot:activator="{ on }">
 								<v-btn v-on="on" color="orange accent-4" class="mr-3 white--text" icon><v-icon>mdi-package-down</v-icon></v-btn>
 							</template>
 							<span>Seal</span>
 						</v-tooltip>
+						<!--● Delete Sprint ●-->
 						<v-tooltip top>  
 							<template v-slot:activator="{ on }">
 								<v-btn v-on="on" color="red accent-4" class="mr-3 white--text" icon><v-icon>mdi-trash-can-outline</v-icon></v-btn>
 							</template>
 							<span>Delete</span>
 						</v-tooltip>
-					</v-row>	
+					</v-row>
+					<!-- ● Task row ● -->	
 					<v-row class="flex-nowrap overflow-auto">
 						<v-col class="grey lighten-3" v-for="(state, stid) in list.state" :key="stid"
 								data-role="drag-drop-container" 
 								@drop="drop($event, stid, sprint)" 
 								@dragover.prevent
 						>
-							<!-- ■■ Sprint page : View detail ■■ -->
+							<!-- ● inner page : View detail ● -->
 							<v-row v-if="title.subsprint != null" no-gutters>
 								<v-col style="min-width: 245px; max-width: 245px;">
 									<v-card class="mx-1" v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid" 
@@ -140,7 +153,7 @@
 									</v-card>								
 								</v-col>								
 							</v-row>
-							<!-- ■■ Sprint page : Index List ■■ -->
+							<!-- ● inner page : Index List ● -->
 							<v-row v-if="title.subsprint == null" no-gutters>
 								<v-col style="min-width: 245px; max-width: 245px;">
 									<v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
@@ -173,7 +186,7 @@
 												</v-list>
 											</v-menu>	
 										</template>
-										<v-tooltip top v-model="focus[task.TASKID.trim()]" color="warning">  
+										<v-tooltip top v-model="focus[task.TASKID.trim()]" color="yellow accent-4">  
 											<template v-slot:activator="{ on }">											
 												<v-chip 											
 													:color="list.prior[task.PRIORITY].color"
@@ -186,7 +199,7 @@
 													@dragstart="dragstart($event, task)"
 													@dragend="dragend"	
 													@mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
-													@click="dialog = {open: true, task: Object.assign({}, task), target: task}"	
+													@click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
 												>		
 													{{task.NAME}}
 												</v-chip>												
@@ -197,6 +210,7 @@
 								</v-col>
 							</v-row>
 						</v-col>
+						<v-spacer class="grey lighten-3"></v-spacer> <!-- SPACER HERE !!! -->
 					</v-row>
 				</v-col>
 			</v-row>
@@ -266,7 +280,7 @@
 					</v-card-text>
 					<v-card-actions> <!-- dialog actions -->
 						<v-spacer></v-spacer>
-						<v-btn color="red darken-1" text @click="deldialog.open = true" 
+						<v-btn color="red darken-1" text @click="dialog.del = true" 
 								:disabled="dialog.target == null">
 								Delete
 						</v-btn>
@@ -280,8 +294,8 @@
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
-			<!-- ● delete task subdialog ● -->
-			<v-dialog v-model="deldialog.open" max-width="250">
+			<!-- ● delete subdialog ● -->
+			<v-dialog v-model="dialog.del" max-width="250">
 				<v-card>
         			<v-card-title class="subtitle-1 red--text">Delete Task?</v-card-title>
 					<v-card-actions>
@@ -289,7 +303,7 @@
 						<v-btn
 							color="blue darken-1"
 							text
-							@click="deldialog.open = false"
+							@click="dialog.del = false"
 						>
 							Cancel
 						</v-btn>
@@ -302,7 +316,70 @@
 						</v-btn>
 					</v-card-actions>
 				</v-card>
-			</v-dialog>		
+			</v-dialog>
+			<!-- ■■ Sprint page : Sprint Dialog ■■ -->
+			<v-dialog v-model="sprintdialog.open" max-width="600px">
+				<v-card>
+					<v-card-title>
+						<span class="headline">New Sprint</span><v-spacer></v-spacer>
+					</v-card-title>
+					<v-card-text>
+						<v-container>
+							<v-form v-model="rule.valid">	
+								<v-row dense>
+									<v-col cols="12">
+										<v-text-field 
+											label="Sprint Name*" 
+											v-model="sprintdialog.prename" 
+											:rules="[v => !!v || 'Name is required']"
+											required
+											clearable
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<!-- ● pretask ● -->
+								<v-row v-for="(task, tid) in sprintdialog.pretask" :key="tid" dense>
+									<v-col cols="6">
+										<v-text-field 
+											label="Task Name*" 
+											v-model="task.NAME"
+											:rules="[v => !!v || 'required']" 
+											required
+											clearable
+										></v-text-field>
+									</v-col>
+									<v-col cols="3">
+										<v-select label="Owner*" 
+													:items="Array.from(list.member)" 
+													:rules="[v => !!v || 'required']"
+													v-model="task.OWNER"										
+										></v-select>									
+									</v-col>
+									<v-col cols="3">
+										<v-select label="Priority" 
+													item-text="name"
+													item-value="value"
+													:items="list.prior"
+													v-model="task.PRIORITY"	
+													:append-outer-icon="tid == 0 ? 'mdi-plus' : 'mdi-minus'"
+													@click:append-outer="tid == 0 ? sprintdialog.pretask.push({PRIORITY: 2}) : sprintdialog.pretask.splice(tid, 1)"
+										></v-select>										
+									</v-col>
+								</v-row>																	
+							</v-form>
+						</v-container>
+					</v-card-text>
+					<v-card-actions> <!-- dialog actions -->
+						<v-spacer></v-spacer>
+						<v-btn color="blue darken-1" text @click="sprintdialog.open = false">
+								Close
+						</v-btn>
+						<v-btn color="blue darken-1" text @click="Addnewsprint()" :disabled="!rule.valid">
+								Save
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
 		</v-container>
 		<!-- ■■■■ Task page ■■■■ -->
 		<v-data-table
@@ -350,8 +427,8 @@ import { mapGetters, mapActions } from "vuex"
     data: () => ({
 		focus: {owner: null},
 		rule: {valid: true},
-		dialog: {open: false, task: {}, target: {}},		
-		deldialog: {open: false},
+		dialog: {open: false, task: {}, target: {}, del: false},
+		sprintdialog: {open: false, prename: "", pretask: [{PRIORITY: 2}]},		
 		infodialog: {info: false, infomsg: "", infotimeout: 3000},
 		list: {sprint: [], state: [], task: [], prior: [], member: [],
 				header: [
@@ -426,6 +503,31 @@ import { mapGetters, mapActions } from "vuex"
             event.dataTransfer.clearData()
 		},
 		// ■■■■ Set Sprint  ■■■■
+		Addnewsprint(){
+			let tentid = this.list.task.map(tk => parseInt(tk.TASKID.trim(), 10))
+										.reduce((now, next) => next > now ? next : now)						
+			let newtask = {TASKID: '',
+							SPRINTID: this.sprintdialog.prename,
+							NAME: '',
+							STATUS: 0,
+							DESCRIPTION: '',
+							OWNER: '',
+							PRIORITY: '',
+							REMAININGPOINT: 20,
+							TOTALPOINT: 20,
+							MODTIME: new Date().toLocaleString()
+						}
+			this.sprintdialog.pretask.forEach(tk => {
+				console.log(tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1)
+				newtask.TASKID = (tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1).toString()
+				newtask.NAME = tk.NAME
+				newtask.OWNER = tk.OWNER
+				newtask.PRIORITY = tk.PRIORITY
+				this.list.task.push(newtask)
+			})
+			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
+			this.sprintdialog = {open: false, prename: "", pretask: [{PRIORITY: 2}]}
+		},
 		editsprint(spr, newspr){
 			this.list.task.filter(tk => tk.SPRINTID == spr).forEach(tk => tk.SPRINTID = newspr)
 			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
@@ -469,7 +571,7 @@ import { mapGetters, mapActions } from "vuex"
 					this.dialog.task.MODTIME = new Date().toLocaleString()
 					this.list.task.push(this.dialog.task)
 				}
-				this.deldialog.open = false
+				this.dialog.del = false
 				this.dialog.open = false
 			}
 			else if(type == 'ownertag'){
