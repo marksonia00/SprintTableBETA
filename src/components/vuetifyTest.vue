@@ -251,7 +251,8 @@
 										<v-select label="Owner*" 
 													:items="list.member" 
 													:rules="[v => !!v || 'Owner is required']"
-													v-model="dialog.task.OWNER">
+													v-model="dialog.task.OWNER"
+													@focus="edit.value = ''">
 											<template v-slot:prepend-item>
 												<v-list-item>	
 													<v-text-field
@@ -370,7 +371,8 @@
 										<v-select label="Owner*" 
 													:items="list.member" 
 													:rules="[v => !!v || 'required']"
-													v-model="task.OWNER">
+													v-model="task.OWNER"
+													@focus="edit.value = ''">
 											<template v-slot:prepend-item>
 												<v-list-item>	
 													<v-text-field
