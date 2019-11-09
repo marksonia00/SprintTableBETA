@@ -247,7 +247,7 @@
 									<v-col cols="6" sm="2" md="2">
 										<v-text-field label="Total pt*" type="number" v-model="dialog.task.TOTALPOINT" required></v-text-field>
 									</v-col>
-									<v-col cols="12" sm="6" md="4"> <!-- AUTOcomplete !!! -->
+									<v-col cols="12" sm="6" md="4"> <!-- Owner slot !!! -->
 										<v-select label="Owner*" 
 													:items="list.member" 
 													:rules="[v => !!v || 'Owner is required']"
@@ -258,8 +258,10 @@
 													<v-text-field
 														label="New Member" 
 														v-model="edit.value" 
+														:rules="[v => v.substr(0, 1) == v.substr(0, 1).toUpperCase() || 'first letter should be UpperCase',
+																v => !list.member.map(mb => mb.substr(0, 1)).includes(v.substr(0, 1)) || 'duplicate first letter']"
 														append-outer-icon="mdi-plus"
-														@click:append-outer="list.member.push(edit.value)"
+														@click:append-outer="Addmember()"
 														dense>
 													</v-text-field>
 												</v-list-item>	
@@ -379,7 +381,9 @@
 														label="New Member" 
 														v-model="edit.value" 
 														append-outer-icon="mdi-plus"
-														@click:append-outer="list.member.push(edit.value)"
+														:rules="[v => v.substr(0, 1) == v.substr(0, 1).toUpperCase() || 'first letter should be UpperCase',
+																v => !list.member.map(mb => mb.substr(0, 1)).includes(v.substr(0, 1)) || 'duplicate first letter']"
+														@click:append-outer="Addmember()"
 														dense>
 													</v-text-field>
 												</v-list-item>	
@@ -393,7 +397,8 @@
 													:items="list.prior"
 													v-model="task.PRIORITY"	
 													:append-outer-icon="tid == 0 ? 'mdi-plus' : 'mdi-minus'"
-													@click:append-outer="tid == 0 ? sprintdialog.pretask.push({PRIORITY: 2}) : sprintdialog.pretask.splice(tid, 1)"
+													@click:append-outer="tid == 0 ? sprintdialog.pretask.push({OWNER: sprintdialog.pretask[0].OWNER, PRIORITY: 2}) 
+																					: sprintdialog.pretask.splice(tid, 1)"
 										>
 											<template v-slot:item="{ item, index }">
 												<span :style="{color: `${item.color}`}">{{item.name}}</span>
@@ -495,20 +500,20 @@ import { mapGetters, mapActions } from "vuex"
 	computed:{
 		...mapGetters(["tasklist"])
 	},
-	sockets: {
-		connect: function () {
-			console.log('socket connected')
-		},
-		updateresponse: function (data) {  					// ! <<<< WebSocket Receive!
-			this.infodialog.info = false
-			console.log(`<<WebSock Receive: ${data}`);
-			this.infodialog.infomsg = `User ${data}`
-			this.infodialog.info = true
-			if(data.substr(0, 6) == 'update')
-				this.initlist()		
-			this.focus[data.substr(7, 6)] = true	
-		}
-    },
+	// sockets: {
+	// 	connect: function () {
+	// 		console.log('socket connected')
+	// 	},
+	// 	updateresponse: function (data) {  					// ! <<<< WebSocket Receive!
+	// 		this.infodialog.info = false
+	// 		console.log(`<<WebSock Receive: ${data}`);
+	// 		this.infodialog.infomsg = `User ${data}`
+	// 		this.infodialog.info = true
+	// 		if(data.substr(0, 6) == 'update')
+	// 			this.initlist()		
+	// 		this.focus[data.substr(7, 6)] = true	
+	// 	}
+    // },
     methods:{
         listonclick(page){
             if(page == 0)
@@ -589,7 +594,14 @@ import { mapGetters, mapActions } from "vuex"
 								MODTIME: ""}
 			this.dialog.open = true
 		},
-
+		// ■■■■ Set member ■■■■
+		Addmember(){
+			!this.list.member.map(mb => mb.substr(0, 1)).includes(this.edit.value.substr(0, 1)) 
+			&& this.edit.value != '' 
+			&& this.edit.value.substr(0, 1) == this.edit.value.substr(0, 1).toUpperCase()? 
+			this.list.member.push(this.edit.value): 
+			this.edit.value = ''
+		},
 		// ■■■■ Data Access ■■■■
 		UpdateTask(type, task, offset){
 			if(type == 'dialog'){ 
@@ -616,7 +628,7 @@ import { mapGetters, mapActions } from "vuex"
 				task.MODTIME = new Date().toLocaleString()
 			}
 				this.updatelist(this.list.task)
-				this.$socket.emit('update', `update ${task.TASKID} ${task.NAME}`) 		// ! WebSocket Send! >>>>
+				// this.$socket.emit('update', `update ${task.TASKID} ${task.NAME}`) 		// ! WebSocket Send! >>>>
 		},
 
 		// ■■■■ Initialize ■■■■		
@@ -626,7 +638,6 @@ import { mapGetters, mapActions } from "vuex"
 			do{	getList = await this.gettaskinfo(0)}
 			while( JSON.stringify(getList) == JSON.stringify(this.list.task) )
 			this.list.task = getList
-			// console.log(this.list.task)
 			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
 			this.list.member = Array.from(new Set(this.list.task.map(task => task.OWNER.trim()).sort()))
 			this.title.extend = true
@@ -649,7 +660,7 @@ import { mapGetters, mapActions } from "vuex"
 	},
 	created(){
 		this.initlist()
-		this.$socket.emit('update', 'login') // ! WebSocket Send! >>>>
+		// this.$socket.emit('update', 'login') // ! WebSocket Send! >>>>
 		
 	},
   }

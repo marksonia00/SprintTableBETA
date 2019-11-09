@@ -8,12 +8,11 @@ import { firestorePlugin } from 'vuefire'
 import VueSocketio from 'vue-socket.io';
 import socketio from 'socket.io-client';
 
-// Vue.use(VueSocketio, socketio('http://localhost:55688/Laputa'), store);
-Vue.use(new VueSocketio({
-  debug: true,
-  connection: 'ws://127.0.0.1:55688' //地址+端口，由后端提供
-}));
-//'ws://127.0.0.1:55688/Laputa'
+// Vue.use(new VueSocketio({
+//   debug: true,
+//   connection: 'ws://127.0.0.1:55688' //address here
+// }));
+
 Vue.config.productionTip = false
 Vue.use(firestorePlugin)
 Vue.use(axios)

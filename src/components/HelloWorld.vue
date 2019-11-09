@@ -1,6 +1,6 @@
 <template>
   <v-container>
-        <v-app-bar app>
+    <v-app-bar app>
       <v-toolbar-title class="headline">
         <span>SPRINT</span>
         <span class="font-weight-light">TABLE beta</span>
@@ -10,7 +10,7 @@
         text
         @click="$router.push('/vuetifytest')"
         target="_blank">
-        <span class="mr-2">admin</span>
+        <span class="mr-2 white--text">admin</span>
       </v-btn>
     </v-app-bar>
 
@@ -30,19 +30,25 @@
           >
             <v-card class="elevation-12">
               <v-toolbar
-                color="primary"
+                :color="reject? 'red' : 'primary'"
                 dark
                 flat
+                extension-height='24'
               >
                 <v-toolbar-title>Login form</v-toolbar-title> 
+                <template v-slot:extension v-if="reject">
+                  <span>please check your account and password</span>
+                </template>  
               </v-toolbar>
               <v-card-text>
-                <v-form @submit.prevent="login">
+                <v-form v-model="valid">
                   <v-text-field
                     label="Login"
                     v-model="user.account"
                     prepend-icon="mdi-account"
                     type="text"
+                    @focus="reject = false"
+                    :rules="[v => !!v || 'required']"
                     required
                   />
                   <v-text-field
@@ -50,12 +56,16 @@
                     v-model="user.password"
                     prepend-icon="mdi-lock"
                     type="password"
+                    @focus="reject = false"
+                    :rules="[v => !!v || 'required']"
                     required
                   />
-                  <v-spacer />
-                  <v-btn color="primary" type="submit">Login</v-btn>
                 </v-form>
               </v-card-text>
+              <v-card-actions>
+                <v-spacer />
+                <v-btn color="primary" :disabled="!valid" @click="login()">Login</v-btn>
+              </v-card-actions>              
             </v-card>
           </v-col>
         </v-row>
@@ -68,11 +78,15 @@
 export default {
   name: 'HelloWorld',
   data: () => ({
+    reject: false,
+    valid: true,
     user: {},
   }),
   methods:{
     login(){
-
+      this.user.account == 'admin' && this.user.password == 'admin' ? 
+              this.$router.push('/vuetifytest') 
+            : this.reject = true
     }
   }
 };
