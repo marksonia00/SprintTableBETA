@@ -155,10 +155,13 @@
 							</v-row>
 							<!-- ● inner page : Index List ● -->
 							<v-row v-if="title.subsprint == null" no-gutters>
-								<v-col style="min-width: 245px; max-width: 245px;">
+								<v-col :style="{minWidth: '245px', maxWidth: '245px', maxHeight: '128px', minHeight: '128px'}"
+												class="overflow-auto">
 									<v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
-											overlap color="blue-grey lighten-1"
-											:style="{opacity: focustask(task.OWNER)}"										
+											overlap color="blue-grey lighten-1" 
+											:class="{'mt-2': tkid < 1 }" 
+											:style="{opacity: focustask(task.OWNER),
+													maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '100%'}"										
 											>
 										<template v-slot:badge>
 											<v-menu offset-y transition="slide-x-transition">
@@ -190,21 +193,23 @@
 											<template v-slot:activator="{ on }">											
 												<v-chip 											
 													:color="list.prior[task.PRIORITY].color"
-													:style="{borderLeft: `5px ${list.prior[task.PRIORITY].color} solid`, opacity: focustask(task.OWNER)}"																
+													:style="{borderLeft: `5px ${list.prior[task.PRIORITY].color} solid`, opacity: focustask(task.OWNER),
+																maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '100%'}"																
 													text-color="black"
 													class="body-1 mr-1 ml-3 mb-2" 
-													outlined=""											 
-													label													
+													outlined								 
+													label	
 													draggable
+													:title="task.NAME"
 													@dragstart="dragstart($event, task)"
 													@dragend="dragend"	
 													@mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
 													@click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
-												>		
-													{{task.NAME}}
+												>															
+													{{task.NAME}} 
 												</v-chip>												
 											</template>
-											<span>Update</span>
+											<span v-if="focus[task.TASKID.trim()]">Update</span>
 										</v-tooltip>	
 									</v-badge>
 								</v-col>
@@ -598,7 +603,8 @@ import { mapGetters, mapActions } from "vuex"
 		Addmember(){
 			!this.list.member.map(mb => mb.substr(0, 1)).includes(this.edit.value.substr(0, 1)) 
 			&& this.edit.value != '' 
-			&& this.edit.value.substr(0, 1) == this.edit.value.substr(0, 1).toUpperCase()? 
+			&& this.edit.value.substr(0, 1) == this.edit.value.substr(0, 1).toUpperCase() 
+			&& this.edit.value.substr(0, 1) != ' '?
 			this.list.member.push(this.edit.value): 
 			this.edit.value = ''
 		},
@@ -699,4 +705,14 @@ import { mapGetters, mapActions } from "vuex"
 	// 		this.initWebSocket();
 	// 	},
 </script>
+
+<style scoped>
+::-webkit-scrollbar{
+  width: 2px;
+  transform: translateX(7px);}
+::-webkit-scrollbar-track{ 
+  background: #f1f1f1;}
+::-webkit-scrollbar-thumb{ 
+  background: #888}
+</style>
 
