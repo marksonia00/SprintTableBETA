@@ -1,40 +1,59 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import vuetifyTest from '@/components/vuetifyTest'
-import HelloWorld from '@/components/HelloWorld'
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
-    path: '/',
-    name: 'HelloWorld',
-    component: HelloWorld
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },
-  {
-    path: '/vuetifytest',
-    name: 'vuetifyTest',
-    component: vuetifyTest
-  },
-  {
-    path: '/helloworld',
-    name: 'HelloWorld',
-    component: HelloWorld
-  },
+	const routes = [
+	{
+		path: '*',
+		redirect: '/Home'
+	},
+	{
+		path: '/Home',
+		name: 'login',
+		component: () => import('../components/login.vue')
+	},
+	{
+		path: '/vuetifytest', 
+		name: 'vuetifyTest',
+		component: () => import('../components/vuetifyTest.vue')
+	},
+	{
+		path: '/index',
+		name: 'index',
+		component: () => import('../components/index.vue'),
+		children: [
+		{
+			path: 'Sprint',
+			name: 'Sprint',
+			component: () => import('../components/page/sprint.vue'),
+		},
+		{
+			path: 'Task',
+			name: 'Task',
+			component: () => import('../components/page/task.vue'),
+		},
+		{
+			path: 'Seal',
+			name: 'Seal',
+			component: () => import('../components/page/seal.vue'),
+		},
+		{
+			path: 'Owner',
+			name: 'Owner',
+			component: () => import('../components/page/owner.vue'),
+		},
+		{
+			path: 'Timeline',
+			name: 'Timeline',
+			component: () => import('../components/page/timeline.vue'),
+		}
+		]
+	},
+	]
 
-]
-
-const router = new VueRouter({
-  routes
-})
+	const router = new VueRouter({
+	routes
+	})
 
 export default router

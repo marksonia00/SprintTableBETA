@@ -13,71 +13,56 @@ export default new Vuex.Store({
     state:{
         logininfo:{},
         logintoken:"",
-        projectinfo:{},
-        tasklist: {}
+        tasklist: {},
+        subtitle: "", 
+        addspr: false
     },
     actions:{
         // ■■ Login ■■■■■■■■■■■
-        async loginAction(store, {account, userKey}) {
-            const api = `${process.env.VUE_APP_apiPATH}/api/Logininfo`
-            let postbody = `ACCOUNT=${account}&USERKEY=${userKey}`
-            let res
-            await axios.post(api, postbody)
-                .then(Response => {
-                    console.log(res)                        
-                    if(Response.data.CODE === 200){
-                        // store.commit("setlogininfo", Response.data.DATA),
-                        // store.commit("setlogintoken", Response.data.TOKEN)   
-                    }
-                    res = Response.data 
-                })
-                .catch(error => res = error)
-            return res    
+        async loginAction(store, token) {
+            store.commit('setlogintoken', token)
         },
         // ■■ Logout ■■■■■■■■■■■
         async logoutAction(store) {
-            const api = `${process.env.VUE_APP_apiPATH}/api/Logoutinfo`;
-            let postbody = `ACCOUNT=${store.state.logininfo.ACCOUNT.trim()}&TOKEN=${store.state.logintoken}`;
-            let res;
-            await axios.post(api, postbody)
-                .then(Response => {
-                    if(Response.data.CODE === 200) {
-                        // store.commit('setlogininfo',"")
-                        // store.commit('setlogintoken',"")
-                        res = Response.data
-                    }
-                })
-            return res      
+            store.commit('setlogintoken', "")
         },
         // ■■ taskinfo ■■■■■■■■■■■
         async gettaskinfo(store,id) {
             let list = null;
-            console.log('request to Firebase...')
             await fs.get()
                 .then(doc => list = doc.data())
                 .catch(error => alert(error))
-            console.log('Response from Firebase')            
+            store.commit('settasklist', list.tasklist)
             return list.tasklist  
         },
         // ■■ Upate List ■■■■■■■■■■■        
-        async updatelist(store, tasklist){
-          await fs.update({tasklist})
-        },
+        async updatelist(store, tasklist){ 
+            await fs.update({tasklist})
+            await dispatch('gettaskinfo')
+        },        
         // ■■ Realtime Binding List ■■■■■■■■■■■      
         bindListRef: firestoreAction(({ bindFirestoreRef }) => {
             return bindFirestoreRef('tasklist', db.firestore().collection('tasklist').doc('v6EUv3f3LCTRQvB4fb0w'))
         }),
+
+        // ● title unit ●
+        setaddspr(store, add) {
+            store.commit('setaddspr', add)
+        },
     },
     mutations:{
         setlogininfo: (state, res) => state.logininfo = res,
         setlogintoken: (state, res) => state.logintoken = res,
-        setprojectinfo: (state, res) => state.projectinfo = res,
+        settasklist: (state, res) => state.tasklist = res,
+        settitle: (state, res) => state.title = res,
+        setaddspr: (state, res) => state.addspr = res,
         ...vuexfireMutations
     },
     getters:{
         logininfo: state => state.logininfo,
         logintoken: state => state.logintoken,
-        projectinfo: state => state.projectinfo,
-        tasklist: state => state.tasklist
+        tasklist: state => state.title,
+        titleinfo: state => state.title,
+        addspr: state => state.addspr
     }
 })

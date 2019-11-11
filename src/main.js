@@ -27,3 +27,8 @@ new Vue({
   vuetify,
   render: h => h(App)
 }).$mount('#app')
+
+// router.beforeEach((to, from, next) => {
+//   store.state.logintoken != "" ? next() : next('/Home')
+// })
+

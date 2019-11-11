@@ -75,8 +75,11 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import { create } from 'domain'
+
 export default {
-  name: 'HelloWorld',
+  name: 'login',
   data: () => ({
     reject: false,
     valid: true,
@@ -84,10 +87,14 @@ export default {
   }),
   methods:{
     login(){
-      this.user.account == 'admin' && this.user.password == 'admin' ? 
-              this.$router.push('/vuetifytest') 
-            : this.reject = true
-    }
+      if(this.user.account == 'admin' && this.user.password == 'admin'){
+        this.loginAction('admin')
+        this.$router.push('/vuetifytest') 
+      }
+      else
+        this.reject = true
+    },
+    ...mapActions(["loginAction", "logoutAction"])
   }
 };
 </script>

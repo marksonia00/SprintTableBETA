@@ -116,7 +116,11 @@
 						<!--● Delete Sprint ●-->
 						<v-tooltip top>  
 							<template v-slot:activator="{ on }">
-								<v-btn v-on="on" color="red accent-4" class="mr-3 white--text" icon><v-icon>mdi-trash-can-outline</v-icon></v-btn>
+								<v-btn icon v-on="on" @click="dialog = {open: false, task: {SPRINTID: sprint}, target: {STATUS: 'DELETE'}, del: true}"
+										color="red accent-4" 
+										class="mr-3 white--text">
+									<v-icon>mdi-trash-can-outline</v-icon>
+								</v-btn>
 							</template>
 							<span>Delete</span>
 						</v-tooltip>
@@ -336,7 +340,9 @@
 						<v-btn
 							color="red darken-1"
 							text
-							@click="UpdateTask('dialog', dialog.task, 'delete')"
+							@click="dialog.target.STATUS == 'DELETE' ?
+                                Deletesprint() :
+                                UpdateTask('dialog', dialog.task, 'delete')"
 						>
 							Delete
 						</v-btn>
@@ -522,7 +528,7 @@ import { mapGetters, mapActions } from "vuex"
     methods:{
         listonclick(page){
             if(page == 0)
-				this.$router.push('/helloworld')
+				this.$router.push('/')
 		},
 		focustask(ow){
 			return ow == this.focus.owner || this.focus.owner == null ? 1 : .25
@@ -573,6 +579,7 @@ import { mapGetters, mapActions } from "vuex"
 				this.list.task.push(Object.assign({}, newtask))
 			})
 			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
+			this.UpdateTask('addsprint', {NAME: this.sprintdialog.prename, TASKID: ''}, '')
 			this.sprintdialog = {open: false, prename: "", pretask: [{PRIORITY: 2}]}
 		},
 		editsprint(spr, newspr){
@@ -581,6 +588,14 @@ import { mapGetters, mapActions } from "vuex"
 			this.edit.sprint = null
 			this.UpdateTask('editsprint', {NAME: newspr, TASKID: ''}, '')
 		},
+        Deletesprint(){
+            this.list.task.filter(tk => tk.SPRINTID.trim() == this.dialog.task.SPRINTID)
+                            .forEach(ftk => this.list.task.splice(this.list.task.findIndex(tk => tk.TASKID == ftk.TASKID), 1))
+            if(this.dialog.task.SPRINTID != '1_STB維護' && this.dialog.task.SPRINTID != '2_學習地圖' && this.dialog.task.SPRINTID != '3_線上任務' )
+                this.UpdateTask('deletesprint', {NAME: this.dialog.task.SPRINTID, TASKID: ''}, '')
+            this.dialog = {open: false, task: {}, target: {}, del: false}
+            this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
+        },
 		// ■■■■ Set task ■■■■
 		Addnewtask(sprint){
 			let tentid = this.list.task.filter(tk => tk.SPRINTID.trim() == sprint)
