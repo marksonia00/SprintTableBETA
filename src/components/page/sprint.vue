@@ -164,7 +164,9 @@
                                                 @mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
                                                 @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
                                             >															
-                                                {{task.NAME}} 
+                                                <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}">
+                                                    {{task.NAME}}
+                                                </span>
                                             </v-chip>												
                                         </template>
                                         <span v-if="focus[task.TASKID.trim()]">Update</span>
@@ -189,17 +191,16 @@
                     <v-container>
                         <v-form v-model="rule.valid">	
                             <v-row>
-                                <v-col cols="12" sm="8" md="8">
+                                <v-col cols="12" sm="8" md="8">                         <!-- NAME -->
                                     <v-text-field 
                                         label="Task Name*" 
                                         v-model="dialog.task.NAME" 
                                         :rules="[v => !!v || 'Name is required']"
                                         required
                                         clearable
-                                    >
-                                    </v-text-field>
+                                    ></v-text-field>
                                 </v-col>
-                                <v-col cols="6" sm="2" md="2">
+                                <v-col cols="6" sm="2" md="2">                          <!-- REMAININGPOINT -->
                                     <v-text-field 
                                         label="Remain pt*" 
                                         type="number" 
@@ -207,17 +208,24 @@
                                         required>
                                     </v-text-field>
                                 </v-col>
-                                <v-col cols="6" sm="2" md="2">
-                                    <v-text-field label="Total pt*" type="number" v-model="dialog.task.TOTALPOINT" required></v-text-field>
+                                <v-col cols="6" sm="2" md="2">                          <!-- TOTALPOINT -->
+                                    <v-text-field 
+                                        label="Total pt*" 
+                                        type="number" 
+                                        v-model="dialog.task.TOTALPOINT" 
+                                        required 
+                                    ></v-text-field>
                                 </v-col>
-                                <v-col cols="12" sm="6" md="4"> <!-- Owner slot !!! -->
-                                    <v-select label="Owner*" 
-                                                :items="list.member" 
-                                                :rules="[v => !!v || 'Owner is required']"
-                                                v-model="dialog.task.OWNER"
-                                                @focus="edit.value = ''">
-                                        <template v-slot:prepend-item>
-                                            <v-list-item>	
+                                <v-col cols="12" sm="6" md="4">                         <!-- OWNER -->
+                                    <v-select 
+                                        label="Owner*" 
+                                        :items="list.member" 
+                                        :rules="[v => !!v || 'Owner is required']"
+                                        v-model="dialog.task.OWNER"
+                                        @focus="edit.value = ''"
+                                    >
+                                        <template v-slot:prepend-item>              
+                                            <v-list-item>	                            <!-- OWNER : add new member-->
                                                 <v-text-field
                                                     label="New Member" 
                                                     v-model="edit.value" 
@@ -231,12 +239,13 @@
                                         </template>
                                     </v-select>
                                 </v-col>
-                                <v-col cols="12" sm="6" md="4">
-                                    <v-select label="Priority" 
-                                                item-text="name"
-                                                item-value="value"
-                                                :items="list.prior"
-                                                v-model="dialog.task.PRIORITY"	
+                                <v-col cols="12" sm="6" md="4">                         <!-- Priority -->
+                                    <v-select 
+                                        label="Priority" 
+                                        item-text="name"
+                                        item-value="value"
+                                        :items="list.prior"
+                                        v-model="dialog.task.PRIORITY"	
                                     >
                                     <template v-slot:item="{ item, index }">
                                         <span :style="{color: `${item.color}`}">{{item.name}}</span>
@@ -246,16 +255,21 @@
                                     </template>
                                     </v-select>									
                                 </v-col>
-                                <v-col cols="12" sm="6" md="4">
-                                    <v-select label="Status" 
-                                                item-text="name"
-                                                item-value="value"
-                                                :items="list.state"
-                                                v-model="dialog.task.STATUS"						
+                                <v-col cols="12" sm="6" md="4">                         <!-- Status -->
+                                    <v-select 
+                                        label="Status" 
+                                        item-text="name"
+                                        item-value="value"
+                                        :items="list.state"
+                                        v-model="dialog.task.STATUS"						
                                     ></v-select>									
                                 </v-col>
-                                <v-col cols="12">
-                                    <v-textarea label="Description" v-model="dialog.task.DESCRIPTION" rows="3"></v-textarea>
+                                <v-col cols="12">                                       <!-- Description -->
+                                    <v-textarea 
+                                        label="Description" 
+                                        v-model="dialog.task.DESCRIPTION" 
+                                        rows="3"
+                                    ></v-textarea>
                                 </v-col>
                             </v-row>
                         </v-form>	
@@ -311,7 +325,8 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container>
-                        <v-form v-model="rule.valid">	
+                        <v-form v-model="rule.valid">
+                            <!-- ● presprint  ● -->	
                             <v-row dense>
                                 <v-col cols="12">
                                     <v-text-field 
@@ -325,7 +340,7 @@
                             </v-row>
                             <!-- ● pretask ● -->
                             <v-row v-for="(task, tid) in sprintdialog.pretask" :key="tid" dense>
-                                <v-col cols="6">
+                                <v-col cols="6">                            <!-- Task Name -->
                                     <v-text-field 
                                         label="Task Name*" 
                                         v-model="task.NAME"
@@ -334,12 +349,13 @@
                                         clearable
                                     ></v-text-field>
                                 </v-col>
-                                <v-col cols="3">
-                                    <v-select label="Owner*" 
-                                                :items="list.member" 
-                                                :rules="[v => !!v || 'required']"
-                                                v-model="task.OWNER"
-                                                @focus="edit.value = ''">
+                                <v-col cols="3">                             <!-- Owner -->
+                                    <v-select  
+                                        label="Owner*" 
+                                        :items="list.member" 
+                                        :rules="[v => !!v || 'required']"
+                                        v-model="task.OWNER"
+                                        @focus="edit.value = ''">
                                         <template v-slot:prepend-item>
                                             <v-list-item>	
                                                 <v-text-field
@@ -355,7 +371,7 @@
                                         </template>									
                                     </v-select>									
                                 </v-col>
-                                <v-col cols="3">
+                                <v-col cols="3">                               <!-- Priority -->
                                     <v-select label="Priority" 
                                                 item-text="name"
                                                 item-value="value"
@@ -574,4 +590,11 @@ import { mapGetters, mapActions } from "vuex"
   background: #f1f1f1;}
 ::-webkit-scrollbar-thumb{ 
   background: #888}
+
+.transitionname{
+    background: linear-gradient(to right, #000000, #000000 50%, #B0BEC5 75%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
 </style>
