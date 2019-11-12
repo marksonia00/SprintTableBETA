@@ -46,8 +46,8 @@ export default new Vuex.Store({
         }),
 
         // ● title unit ●
-        setaddspr(store, add) {
-            store.commit('setaddspr', add)
+        setaddspr(store, open) {
+            store.commit('setaddspr', open)
         },
     },
     mutations:{
@@ -61,7 +61,7 @@ export default new Vuex.Store({
     getters:{
         logininfo: state => state.logininfo,
         logintoken: state => state.logintoken,
-        tasklist: state => state.title,
+        tasklist: state => state.tasklist,
         titleinfo: state => state.title,
         addspr: state => state.addspr
     }

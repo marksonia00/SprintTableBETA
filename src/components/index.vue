@@ -89,7 +89,6 @@ import { mapGetters, mapActions } from "vuex"
 		focus: {owner: null},
 		rule: {valid: true},
 		dialog: {open: false, task: {}, target: {}, del: false},
-		sprintdialog: {open: false, prename: "", pretask: [{PRIORITY: 2}]},		
 		infodialog: {info: false, infomsg: "", infotimeout: 3000},
 		list: {sprint: [], state: [], task: [], prior: [], member: []},
 		edit: {sprint: null, value: ''},
@@ -126,7 +125,7 @@ import { mapGetters, mapActions } from "vuex"
         listonclick(page){ 
 				this.$router.push(`/index/${this.navlist[page].title}`)
 		},
-		...mapActions(['changetitle'])
+		...mapActions(['changetitle','setaddspr'])
 	},
 	created(){
         this.list.state = [

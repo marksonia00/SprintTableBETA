@@ -1,7 +1,7 @@
 <template>
 <!-- ■■■■ Sprint page ■■■■ -->
     <v-container class="fill-height d-flex align-start" fluid>
-        <v-row no-gutters v-for="(sprint, spid) in sprintfilter()" :key="spid">
+        <v-row no-gutters v-for="(sprint, spid) in (title.subsprint != null ? [title.subsprint] : list.sprint)" :key="spid">
             <v-col>
                 <!-- ● Title action row ● -->
                 <v-row>
@@ -112,10 +112,12 @@
                         </v-row>
                         <!-- ● inner page : Index List ● -->
                         <v-row v-if="title.subsprint == null" no-gutters>
-                            <v-col style="min-width: 245px; max-width: 245px;">
+                            <v-col :style="{minWidth: '245px', maxWidth: '245px', maxHeight: '128px', minHeight: '128px'}"
+                                            class="overflow-auto">
                                 <v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
                                         overlap color="blue-grey lighten-1" 
-                                        :style="{opacity: focustask(task.OWNER),
+                                        :class="{'mt-2': tkid < 1 }"
+                                        :style="{opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
                                                 maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '100%'}"										
                                         >
                                     <template v-slot:badge>
@@ -148,7 +150,8 @@
                                         <template v-slot:activator="{ on }">											
                                             <v-chip 											
                                                 :color="list.prior[task.PRIORITY].color"
-                                                :style="{borderLeft: `5px ${list.prior[task.PRIORITY].color} solid`, opacity: focustask(task.OWNER),
+                                                :style="{borderLeft: `5px ${list.prior[task.PRIORITY].color} solid`, 
+                                                            opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
                                                             maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '100%'}"																
                                                 text-color="black"
                                                 class="body-1 mr-1 ml-3 mb-2" 
@@ -301,7 +304,7 @@
             </v-card>
         </v-dialog>
         <!-- ■■ Sprint page : Sprint Dialog ■■ -->
-        <v-dialog v-model="addspr" max-width="600px">
+        <v-dialog v-model="addspr" max-width="600px" @click:outside="setaddspr(false)">
             <v-card>
                 <v-card-title>
                     <span class="headline">New Sprint</span><v-spacer></v-spacer>
@@ -397,15 +400,11 @@ import { mapGetters, mapActions } from "vuex"
 
   export default {
     name: 'Sprint',
-    props: {
-         source: String,
-    },
     data: () => ({
 		focus: {owner: null},
 		rule: {valid: true},
 		dialog: {open: false, task: {}, target: {}, del: false},
 		sprintdialog: {open: false, prename: "", pretask: [{PRIORITY: 2}]},		
-		infodialog: {info: false, infomsg: "", infotimeout: 3000},
 		list: {sprint: [], state: [], task: [], prior: [], member: []},
 		edit: {sprint: null, value: ''},
         title: {page: 1, subsprint: null},
@@ -415,16 +414,7 @@ import { mapGetters, mapActions } from "vuex"
 		...mapGetters(["tasklist", "titleinfo", "addspr"])
 	},
     methods:{
-        listonclick(page){
-            if(page == 0)
-				this.$router.push('/helloworld')
-		},
-		focustask(ow){
-			return ow == this.focus.owner || this.focus.owner == null ? 1 : .25
-		},
-		sprintfilter(){
-			return this.title.subsprint != null ? [this.title.subsprint] :this.list.sprint
-		},
+        // ■■■■ Filter task by "sprint" & "status" ■■■■
 		taskfilter(sprint, state){
 			return this.list.task.filter(task => task.SPRINTID.trim() == sprint && task.STATUS == state)
 		},
