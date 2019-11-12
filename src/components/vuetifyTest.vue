@@ -210,7 +210,10 @@
 													@mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
 													@click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
 												>															
-													{{task.NAME}} 
+													<span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}"
+															:style="{maxWidth: '100%'}">
+														{{task.NAME}}
+													</span>
 												</v-chip>												
 											</template>
 											<span v-if="focus[task.TASKID.trim()]">Update</span>
@@ -729,5 +732,12 @@ import { mapGetters, mapActions } from "vuex"
   background: #f1f1f1;}
 ::-webkit-scrollbar-thumb{ 
   background: #888}
+
+.transitionname{
+    background: linear-gradient(to right, #000000, #000000 75%, #B0BEC5 90%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
 </style>
 

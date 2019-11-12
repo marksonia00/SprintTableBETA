@@ -164,7 +164,8 @@
                                                 @mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
                                                 @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
                                             >															
-                                                <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}">
+                                                <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}"
+                                                        :style="{maxWidth: '100%'}">
                                                     {{task.NAME}}
                                                 </span>
                                             </v-chip>												
@@ -592,7 +593,7 @@ import { mapGetters, mapActions } from "vuex"
   background: #888}
 
 .transitionname{
-    background: linear-gradient(to right, #000000, #000000 50%, #B0BEC5 75%);
+    background: linear-gradient(to right, #000000, #000000 75%, #B0BEC5 90%);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
