@@ -47,16 +47,19 @@ export default {
 		// ■■■■ Data Access ■■■■
 		mixinUpdater(type, data, offset){
             let templist = this.tasklist
+            let index = null
+            Array.isArray(data) ? true : index = this.tasklist.findIndex(tk => tk.TASKID == data)
             if(type == 'submitTask'){                   // *data from dialog & sprintActionBtn
-                templist = Object.assign({}, data)
-			}
+                templist = data
+            }
+            else if(type == 'dialogDelete'){
+                templist.splice(index, 1)                
+            }
 			else if(type == 'ownerTag'){                // *data from ownerTag		        
-                let index = this.tasklist.findIndex(tk => tk.TASKID == data.TASKID) 
                 templist[index].OWNER = offset
                 templist[index].MODTIME = new Date().toLocaleString()
             }
-            else if(type == 'dropStatus'){
-                let index = this.tasklist.findIndex(tk => tk.TASKID == data) 
+            else if(type == 'dropStatus'){              // *data from dragdrop
                 templist[index].STATUS = offset
                 templist[index].MODTIME = new Date().toLocaleString()
             }

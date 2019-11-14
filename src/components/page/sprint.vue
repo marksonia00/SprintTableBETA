@@ -142,7 +142,7 @@
                                                     <v-list-item v-for="(member, mid) in Array.from(new Set(tasklist.map(task => task.OWNER.trim()).sort()))" 
                                                                 :key="mid" 
                                                                 :value="member"
-                                                                @click="mixinUpdater('ownertag', task, member)">
+                                                                @click="mixinUpdater('ownerTag', task.TASKID, member)">
                                                         <v-list-item-title>{{ member }}</v-list-item-title>
                                                     </v-list-item>
                                                 </v-list-item-group>
@@ -216,8 +216,7 @@
                         color="red darken-1"
                         text
                         @click="dialog.target.STATUS == 'DELETE' ?
-                                sprintaction('delete') :
-                                mixinUpdater('dialogDelete', dialog.task, 'delete')"
+                                sprintaction('delete') : deletetask()"                                   
                     >
                         Delete
                     </v-btn>
@@ -276,6 +275,11 @@ import mixindata from '../mixin/mixindata'
         dragend(event){
             event.dataTransfer.clearData()
         },
+        // ■■■■ Delete dialog ■■■■
+        deletetask(){                                                                           //! => '../mixin/mixindata'
+            this.mixinUpdater('dialogDelete', this.dialog.task.TASKID, '')
+            this.dialog = {open: false, task: {}, target: {}, del: false}
+        },
 		// ■■■■ Title Action row ■■■■
 		sprintaction(type, spr, newspr){ 
             let templist = this.tasklist               
@@ -289,8 +293,8 @@ import mixindata from '../mixin/mixindata'
                                     .forEach(ftk => templist.splice(templist.findIndex(tk => tk.TASKID == ftk.TASKID), 1))
                 this.dialog = {open: false, task: {}, target: {}, del: false}
             }
-            this.mixinUpdater('submitTask', templist, '')
-        },
+            this.mixinUpdater('submitTask', templist, '')                                       //! => '../mixin/mixindata'
+        },       
 		// ■■■■ Initialize ■■■■		
 		async initlist(){
 			this.overlay = true	
@@ -298,12 +302,10 @@ import mixindata from '../mixin/mixindata'
 			// do{	getList = await this.gettaskinfo(0)}
 			// while( JSON.stringify(getList) == JSON.stringify(this.list.task) )
             // this.list.task = getList
-            await this.gettaskinfo(0)
-			this.list.task = this.tasklist
-			
+            await this.gettaskinfo(0)			
 			this.overlay = false
 		},
-		...mapActions(["gettaskinfo", "updatelist","bindListRef","changetitle","setaddspr"])
+		...mapActions(["gettaskinfo", "setaddspr"])
 	},
 	created(){
 		this.initlist()		

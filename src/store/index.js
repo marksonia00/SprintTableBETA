@@ -13,7 +13,7 @@ export default new Vuex.Store({
     state:{
         logininfo:{},
         logintoken:"",
-        tasklist: {},
+        tasklist: [],
         subtitle: "", 
         addspr: false
     },
@@ -32,13 +32,14 @@ export default new Vuex.Store({
             await fs.get()
                 .then(doc => list = doc.data())
                 .catch(error => alert(error))
+            Array.isArray(list.tasklist)? true : list.tasklist = Object.values(list.tasklist) 
             store.commit('settasklist', list.tasklist)
-            return list.tasklist  
+            return list.tasklist
         },
         // ■■ Upate List ■■■■■■■■■■■        
         async updatelist(store, tasklist){ 
             await fs.update({tasklist})
-            await dispatch('gettaskinfo')
+            await store.dispatch('gettaskinfo')
         },        
         // ■■ Realtime Binding List ■■■■■■■■■■■      
         bindListRef: firestoreAction(({ bindFirestoreRef }) => {

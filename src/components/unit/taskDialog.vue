@@ -98,14 +98,15 @@
             <v-spacer></v-spacer>
             <v-btn color="red darken-1" text 
                     @click="$emit('update:del', true)" 
-                    :disabled="target == null">
+                    :disabled="typeof target == 'string'">
                     Delete
             </v-btn>
             <v-btn color="blue darken-1" text 
                     @click="$emit('update:open', false)">
                     Close
             </v-btn>
-            <v-btn color="blue darken-1" text @click="submitTask()" 
+            <v-btn color="blue darken-1" text 
+                    @click="typeof target == 'string'? submitTask('create') : submitTask('update')" 
                     :disabled="JSON.stringify(target) == JSON.stringify(task) || !rule.valid">
                     Save
             </v-btn>
@@ -132,21 +133,15 @@ export default {
 		submitTask(type){
             let templist = this.tasklist
             if(type == 'create'){                     //* create 
-                let tentid = this.tasklist.filter(tk => tk.SPRINTID.trim() == sprint)
+                let tentid = this.tasklist.filter(tk => tk.SPRINTID.trim() == this.target)
                                             .map(tk => parseInt(tk.TASKID.trim(), 10))
                                             .reduce((now, next) => next > now ? next : now)
                 let newtask = Object.assign({}, this.task)
                 newtask.TASKID = (tentid + 1).toString()
                 newtask.SPRINTID = this.target
                 newtask.MODTIME = new Date().toLocaleString()
-                templist.push(Object.assign({}, this.task))
+                templist.push(Object.assign({}, newtask))
             }
-
-            else if(type == 'delete'){                 //* delete
-                let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
-                templist.splice(index, 1)
-            } 
-
             else if(type == 'update'){                  //* update
                 let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
                 templist[index] = Object.assign({}, this.task)

@@ -104,12 +104,12 @@ export default {
 			let templist = this.tasklist
 			let tentid = this.tasklist.map(tk => parseInt(tk.TASKID.trim(), 10))
 										.reduce((now, next) => next > now ? next : now)						
-			let newtask = Object.assign({}, this.preaddtask) 
+			let newtask = Object.assign({}, this.mixin.preaddtask) 
 			newtask.SPRINTID = this.presprint.NAME,
 			newtask.MODTIME = new Date().toLocaleString()
 
 			this.pretask.forEach(tk => {
-				newtask.TASKID = (tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1).toString()
+				newtask.TASKID = (tentid - tentid % 100 + 100 + this.pretask.indexOf(tk) + 1).toString()
 				newtask.NAME = tk.NAME
 				newtask.OWNER = tk.OWNER
 				newtask.PRIORITY = tk.PRIORITY
