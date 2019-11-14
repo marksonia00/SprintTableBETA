@@ -57,6 +57,7 @@
                     prepend-icon="mdi-lock"
                     type="password"
                     @focus="reject = false"
+                    @keypress="valid ? passwordenter($event) : true"
                     :rules="[v => !!v || 'required']"
                     required
                   />
@@ -86,6 +87,10 @@ export default {
     user: {},
   }),
   methods:{
+    passwordenter(event){
+      if (event.charCode == 13)
+        this.login()
+    },
     login(){
       if(this.user.account == 'admin' && this.user.password == 'admin'){
         this.loginAction('admin')

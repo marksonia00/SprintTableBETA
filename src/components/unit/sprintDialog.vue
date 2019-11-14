@@ -24,7 +24,7 @@
 							<v-text-field 
 								label="Task Name*" 
 								v-model="task.NAME"
-								:rules="[v => !!v || 'required']" 
+								:rules="[v => !!v || ' required']"
 								required
 								clearable
 							></v-text-field>
@@ -101,29 +101,24 @@ export default {
 	},
 	methods:{
 		Addnewsprint(){
-			let tentid = this.list.task.map(tk => parseInt(tk.TASKID.trim(), 10))
+			let templist = this.tasklist
+			let tentid = this.tasklist.map(tk => parseInt(tk.TASKID.trim(), 10))
 										.reduce((now, next) => next > now ? next : now)						
-			let newtask = {TASKID: '',
-							SPRINTID: this.sprintdialog.prename,
-							NAME: '',
-							STATUS: 0,
-							DESCRIPTION: '',
-							OWNER: '',
-							PRIORITY: '',
-							REMAININGPOINT: 20,
-							TOTALPOINT: 20,
-							MODTIME: new Date().toLocaleString()
-						}
-			this.sprintdialog.pretask.forEach(tk => {
+			let newtask = Object.assign({}, this.preaddtask) 
+			newtask.SPRINTID = this.presprint.NAME,
+			newtask.MODTIME = new Date().toLocaleString()
+
+			this.pretask.forEach(tk => {
 				newtask.TASKID = (tentid - tentid % 100 + 100 + this.sprintdialog.pretask.indexOf(tk) + 1).toString()
 				newtask.NAME = tk.NAME
 				newtask.OWNER = tk.OWNER
 				newtask.PRIORITY = tk.PRIORITY
-				this.list.task.push(Object.assign({}, newtask))
+				templist.push(Object.assign({}, newtask))
 			})
-			this.list.sprint = new Set(this.list.task.map(task => task.SPRINTID.trim()).sort())
-            this.sprintdialog = {open: false, prename: "", pretask: [{PRIORITY: 2}]}
-            this.setaddspr(false)
+			this.mixinUpdater('submitTask', templist, '')		//! => '../mixin/mixindata'
+			this.$emit('update:presprint', {})
+			this.$emit('update:pretask', {PRIORITY: 2})
+			this.setaddspr(false)
 		},
 		...mapActions(["setaddspr"])
 	}

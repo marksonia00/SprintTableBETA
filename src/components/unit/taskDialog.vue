@@ -34,7 +34,7 @@
                                 required 
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">                         <!-- OWNER -->
+                        <v-col cols="12" sm="6" md="4">          <!-- OWNER -->
                             <v-select 
                                 label="Owner*" 
                                 :items="mixin.member" 
@@ -43,7 +43,7 @@
                                 @focus="mixin.value = ''"
                             >
                                 <template v-slot:prepend-item>              
-                                    <v-list-item>	                            <!-- OWNER : add new member-->
+                                    <v-list-item>	            <!-- OWNER : add new member-->
                                         <v-text-field
                                             label="New Member" 
                                             v-model="mixin.value" 
@@ -57,7 +57,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">                         <!-- Priority -->
+                        <v-col cols="12" sm="6" md="4">           <!-- Priority -->
                             <v-select 
                                 label="Priority" 
                                 item-text="name"
@@ -105,7 +105,7 @@
                     @click="$emit('update:open', false)">
                     Close
             </v-btn>
-            <v-btn color="blue darken-1" text @click="UpdateTask('dialog', task, 'update')" 
+            <v-btn color="blue darken-1" text @click="submitTask()" 
                     :disabled="JSON.stringify(target) == JSON.stringify(task) || !rule.valid">
                     Save
             </v-btn>
@@ -126,8 +126,37 @@ export default {
     }),
 	computed:{
         ...mapGetters(["tasklist"]),
-    },
+    },   
     methods:{
+		// ■■■■ Set task ■■■■
+		submitTask(type){
+            let templist = this.tasklist
+            if(type == 'create'){                     //* create 
+                let tentid = this.tasklist.filter(tk => tk.SPRINTID.trim() == sprint)
+                                            .map(tk => parseInt(tk.TASKID.trim(), 10))
+                                            .reduce((now, next) => next > now ? next : now)
+                let newtask = Object.assign({}, this.task)
+                newtask.TASKID = (tentid + 1).toString()
+                newtask.SPRINTID = this.target
+                newtask.MODTIME = new Date().toLocaleString()
+                templist.push(Object.assign({}, this.task))
+            }
+
+            else if(type == 'delete'){                 //* delete
+                let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
+                templist.splice(index, 1)
+            } 
+
+            else if(type == 'update'){                  //* update
+                let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
+                templist[index] = Object.assign({}, this.task)
+                templist[index].MODTIME = new Date().toLocaleString()
+            }   
+
+            this.mixinUpdater('submitTask', templist, '')     //! => '../mixin/mixindata'
+            this.$emit('update:open', false)
+            this.$emit('update:del', false)
+        },
     }
 }
 </script>
