@@ -8,7 +8,7 @@
       <v-spacer></v-spacer>
       <v-btn
         text
-        @click="$router.push('/vuetifytest')"
+        @click="$router.push('/index')"
         target="_blank">
         <span class="mr-2 white--text">admin</span>
       </v-btn>
@@ -94,7 +94,7 @@ export default {
     login(){
       if(this.user.account == 'admin' && this.user.password == 'admin'){
         this.loginAction('admin')
-        this.$router.push('/vuetifytest') 
+        this.$router.push('/index') 
       }
       else
         this.reject = true
