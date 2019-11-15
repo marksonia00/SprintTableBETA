@@ -18,14 +18,34 @@ export default new Vuex.Store({
         addspr: false
     },
     actions:{
-        // ■■ Login ■■■■■■■■■■■
-        async loginAction(store, token) {
-            store.commit('setlogintoken', token)
+        // ■■ Signup ■■■■■■■■■■■
+        async signupAction(store, {acc, pwd}) {
+            let result = ''
+            let postbody = `account=${acc}&password=${pwd}`
+            await axios.post(`${process.env.VUE_APP_firefx}/log/signup` , postbody)
+                .then(response => result = response.data)
+                .catch(error => console.log(error))
+            console.log(result)
+            return result   
         },
+
+        // ■■ Login ■■■■■■■■■■■
+        async loginAction(store, {acc, pwd}) {
+            let result = ''
+            let postbody = `account=${acc}&password=${pwd}`
+            await axios.post(`${process.env.VUE_APP_firefx}/log/login` , postbody)
+                .then(response => result = response.data)
+                .catch(error => console.log(error))
+            console.log(result)
+            // store.commit('setlogintoken', token)
+            return result   
+        },
+
         // ■■ Logout ■■■■■■■■■■■
         async logoutAction(store) {
             store.commit('setlogintoken', "")
         },
+
         // ■■ taskinfo ■■■■■■■■■■■
         async gettaskinfo(store,id) {
             let list = null;
@@ -36,11 +56,13 @@ export default new Vuex.Store({
             store.commit('settasklist', list.tasklist)
             return list.tasklist
         },
+
         // ■■ Upate List ■■■■■■■■■■■        
         async updatelist(store, tasklist){ 
             await fs.update({tasklist})
             await store.dispatch('gettaskinfo')
-        },        
+        }, 
+               
         // ■■ Realtime Binding List ■■■■■■■■■■■      
         bindListRef: firestoreAction(({ bindFirestoreRef }) => {
             return bindFirestoreRef('tasklist', db.firestore().collection('tasklist').doc('v6EUv3f3LCTRQvB4fb0w'))

@@ -65,6 +65,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
+                <v-btn color="secondary" :disabled="!valid || wait" @click="signup()">{{wait?'wait':'Signup'}}</v-btn>
                 <v-btn color="primary" :disabled="!valid" @click="login()">Login</v-btn>
               </v-card-actions>              
             </v-card>
@@ -82,6 +83,7 @@ import { create } from 'domain'
 export default {
   name: 'login',
   data: () => ({
+    wait: false,
     reject: false,
     valid: true,
     user: {},
@@ -91,15 +93,20 @@ export default {
       if (event.charCode == 13) 
         this.login()
     },
-    login(){
-      if(this.user.account == 'admin' && this.user.password == 'admin'){
-        this.loginAction('admin')
-        this.$router.push('/index') 
-      }
-      else
+    async login(){
+      let result = await this.loginAction({acc: this.user.account, pwd: this.user.password})
+      alert(result.msg)
+      result.code == 201?
+        this.$router.push('/index') :
         this.reject = true
     },
-    ...mapActions(["loginAction", "logoutAction"])
+    async signup(){
+        this.wait = true
+        let result = await this.signupAction({acc: this.user.account, pwd: this.user.password})
+        this.wait = false
+        alert(result.msg)
+    },
+    ...mapActions(["loginAction", "logoutAction", "signupAction"])
   }
 };
 </script>
