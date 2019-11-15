@@ -16,7 +16,7 @@ export default {
 				{value: 2, name: 'Mid',     color: '#1565C0'}, 
                 {value: 3, name: 'Low',     color: '#37474F'}
             ],
-            preaddtask: {    //prepare for new task default data
+            preaddtask: {    //default data prepared for new task 
                 TASKID: "",
                 SPRINTID: "",
                 NAME: "",
@@ -45,14 +45,14 @@ export default {
             this.mixin.value = ''
         },
 		// ■■■■ Data Access ■■■■
-		mixinUpdater(type, data, offset){
+		mixinUpdater(type, data, offset){   // update center => vuex
             let templist = this.tasklist
             let index = null
             Array.isArray(data) ? true : index = this.tasklist.findIndex(tk => tk.TASKID == data)
             if(type == 'submitTask'){                   // *data from dialog & sprintActionBtn
                 templist = data
             }
-            else if(type == 'dialogDelete'){
+            else if(type == 'dialogDelete'){            // *data from subdialog 'delete'
                 templist.splice(index, 1)                
             }
 			else if(type == 'ownerTag'){                // *data from ownerTag		        

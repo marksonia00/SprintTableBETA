@@ -14,7 +14,7 @@ export default new Vuex.Store({
         logininfo:{},
         logintoken:"",
         tasklist: [],
-        subtitle: "", 
+        subtitle: null, 
         addspr: false
     },
     actions:{
@@ -50,12 +50,17 @@ export default new Vuex.Store({
         setaddspr(store, open) {
             store.commit('setaddspr', open)
         },
+
+        // ● title unit ●
+        setsubtitle(store, sub) {
+            store.commit('setsubtitle', sub)
+        },
     },
     mutations:{
         setlogininfo: (state, res) => state.logininfo = res,
         setlogintoken: (state, res) => state.logintoken = res,
         settasklist: (state, res) => state.tasklist = res,
-        settitle: (state, res) => state.title = res,
+        setsubtitle: (state, res) => state.subtitle = res,
         setaddspr: (state, res) => state.addspr = res,
         ...vuexfireMutations
     },
@@ -63,7 +68,7 @@ export default new Vuex.Store({
         logininfo: state => state.logininfo,
         logintoken: state => state.logintoken,
         tasklist: state => state.tasklist,
-        titleinfo: state => state.title,
+        subtitle: state => state.subtitle,
         addspr: state => state.addspr
     }
 })

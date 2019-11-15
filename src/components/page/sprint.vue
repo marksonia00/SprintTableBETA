@@ -3,7 +3,7 @@
     <v-container class="fill-height d-flex align-start" fluid>
         <v-row no-gutters 
             v-for="(sprint, spid) 
-                    in (title.subsprint != null ? [title.subsprint] 
+                    in (subtitle != null ? [subtitle] 
                         : Array.from(new Set(tasklist.map(task => task.SPRINTID.trim()).sort())))" :key="spid">
             <v-col>
                 <!-- ● Title action row ● -->
@@ -12,13 +12,13 @@
                     <v-tooltip top v-if="edit.sprint != sprint">  
                         <template v-slot:activator="{ on }">
                             <v-btn text color="grey darken-3" class="title" v-on="on"
-                                @click="title.subsprint == null ? title.subsprint = sprint : title.subsprint = null">
-                                <v-icon v-if="title.subsprint == null" color="teal darken-2" left>mdi-label</v-icon>
-                                <v-icon v-if="title.subsprint != null" color="orange darken-2">mdi-arrow-left</v-icon>						
+                                @click="subtitle == null ? setsubtitle(sprint) : setsubtitle(null)">
+                                <v-icon v-if="subtitle == null" color="teal darken-2" left>mdi-label</v-icon>
+                                <v-icon v-if="subtitle != null" color="orange darken-2">mdi-arrow-left</v-icon>						
                                 {{sprint}}
                             </v-btn>
                         </template>
-                        <span v-if="title.subsprint == null">View Detail</span>
+                        <span v-if="subtitle == null">View Detail</span>
                         <span v-else>Back to List</span>
                     </v-tooltip>
                     <!--● Edit Sprint : check ●-->
@@ -89,7 +89,7 @@
                             @dragover.prevent
                     >
                         <!-- ● inner page : View detail ● -->
-                        <v-row v-if="title.subsprint != null" no-gutters>
+                        <v-row v-if="subtitle != null" no-gutters>
                             <v-col style="min-width: 245px; max-width: 245px;">
                                 <v-card class="mx-1" v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid" 
                                     hover width="244" 
@@ -114,7 +114,7 @@
                             </v-col>								
                         </v-row>
                         <!-- ● inner page : Index List ● -->
-                        <v-row v-if="title.subsprint == null" no-gutters>
+                        <v-row v-if="subtitle == null" no-gutters>
                             <v-col :style="{minWidth: '245px', maxWidth: '245px', maxHeight: '128px', minHeight: '128px'}"
                                             class="overflow-auto">
                                 <v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
@@ -244,16 +244,13 @@ import mixindata from '../mixin/mixindata'
     mixins: [mixindata],
     data: () => ({
 		focus: {owner: null},
-		rule: {valid: true},
-		dialog: {open: false, task: {}, target: {}, del: false},
-		sprintdialog: {presprint: {}, pretask: [{PRIORITY: 2}]},		
-		list: {task: []},
+		dialog: {open: false, task: {}, target: {}, del: false},    //Sync data => task dialog component
+		sprintdialog: {presprint: {}, pretask: [{PRIORITY: 2}]},	//Sync data => sprint dialog component	
 		edit: {sprint: null, value: ''},
-        title: {subsprint: null},
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["tasklist", "titleinfo", "addspr"])
+		...mapGetters(["tasklist", "subtitle", "addspr"])
 	},
     methods:{
         // ■■■■ Filter task by "sprint" & "status" ■■■■
@@ -276,7 +273,7 @@ import mixindata from '../mixin/mixindata'
             event.dataTransfer.clearData()
         },
         // ■■■■ Delete dialog ■■■■
-        deletetask(){                                                                           //! => '../mixin/mixindata'
+        deletetask(){                                                         //! => '../mixin/mixindata'
             this.mixinUpdater('dialogDelete', this.dialog.task.TASKID, '')
             this.dialog = {open: false, task: {}, target: {}, del: false}
         },
@@ -293,7 +290,7 @@ import mixindata from '../mixin/mixindata'
                                     .forEach(ftk => templist.splice(templist.findIndex(tk => tk.TASKID == ftk.TASKID), 1))
                 this.dialog = {open: false, task: {}, target: {}, del: false}
             }
-            this.mixinUpdater('submitTask', templist, '')                                       //! => '../mixin/mixindata'
+            this.mixinUpdater('submitTask', templist, '')                     //! => '../mixin/mixindata'
         },       
 		// ■■■■ Initialize ■■■■		
 		async initlist(){
@@ -305,7 +302,7 @@ import mixindata from '../mixin/mixindata'
             await this.gettaskinfo(0)			
 			this.overlay = false
 		},
-		...mapActions(["gettaskinfo", "setaddspr"])
+		...mapActions(["gettaskinfo", "setaddspr", "setsubtitle"])
 	},
 	created(){
 		this.initlist()		

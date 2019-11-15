@@ -87,8 +87,8 @@ export default {
     user: {},
   }),
   methods:{
-    passwordenter(event){
-      if (event.charCode == 13)
+    passwordenter(event){     // charCode: 13 => 'Enter'
+      if (event.charCode == 13) 
         this.login()
     },
     login(){

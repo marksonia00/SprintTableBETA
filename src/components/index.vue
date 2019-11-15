@@ -6,13 +6,13 @@
 		<v-toolbar-title>
             {{navlist[title.page].title}}
         </v-toolbar-title>
-		<v-icon class="ml-4" v-if="title.subsprint != null">mdi-chevron-right</v-icon>								
-		<div class="ml-4" v-if="title.subsprint != null">
-            {{title.subsprint}}
+		<v-icon class="ml-4" v-if="subtitle != null">mdi-chevron-right</v-icon>								
+		<div class="ml-4" v-if="subtitle != null">
+            {{subtitle}}
         </div>
 		<template v-slot:extension v-if="title.page == 1 || title.page == 2">
 			<v-row class="indigo lighten-1 flex-nowrap">
-				<v-col v-for="(state, stid) in list.state" :key="stid" style="max-height: 47px;">
+				<v-col v-for="(state, stid) in mixin.state" :key="stid" style="max-height: 47px;">
 					<div class="title white--text" style="min-width: 245px; max-width: 245px;">
 						{{state.name}}
 					</div>
@@ -79,20 +79,17 @@
 <script>
 import { log } from 'util'
 import { mapGetters, mapActions } from "vuex"
+import mixindata from './mixin/mixindata'
 
   export default {
-    name: 'index',
+	name: 'index',
+	mixins: [mixindata],  //* Outside data() !!!
     props: {
       source: String,
     },
     data: () => ({
-		focus: {owner: null},
-		rule: {valid: true},
-		dialog: {open: false, task: {}, target: {}, del: false},
 		infodialog: {info: false, infomsg: "", infotimeout: 3000},
-		list: {sprint: [], state: [], task: [], prior: [], member: []},
-		edit: {sprint: null, value: ''},
-        title: {page: 1, subsprint: null},
+        title: {page: 1},
         navlist: [  {title: 'Home', icon: 'mdi-home'}, 
                     {title: 'Sprint', icon: 'mdi-expand-all'},
 					{title: 'Owner', icon: 'mdi-account-multiple'},
@@ -104,7 +101,7 @@ import { mapGetters, mapActions } from "vuex"
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["tasklist", "addspr"])
+		...mapGetters(["tasklist", "addspr", "subtitle"])
 	},
 	// sockets: {
 	// 	connect: function () {
@@ -125,15 +122,9 @@ import { mapGetters, mapActions } from "vuex"
         listonclick(page){ 
 				this.$router.push(`/index/${this.navlist[page].title}`)
 		},
-		...mapActions(['changetitle','setaddspr'])
+		...mapActions(['changetitle', 'setaddspr'])
 	},
 	created(){
-        this.list.state = [
-            {value: 0, name: "to do", color: "teal accent-4"}, 
-            {value: 1, name: "in process", color: "light-blue accent-4"}, 
-            {value: 2, name: "checking", color: "amber accent-4"}, 
-            {value: 3, name: "done", color: "light-green accent-4"}, 
-            ] 	
 		this.listonclick(1)
 	},
   }
