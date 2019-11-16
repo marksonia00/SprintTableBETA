@@ -19,7 +19,7 @@
 				</v-col>
 				<v-spacer /> <!-- SPACER HERE !!! -->
 			</v-row>
-			<v-tooltip left v-if="title.page == 1">  
+			<v-tooltip left v-if="title.page == 0">  
 				<template v-slot:activator="{ on }">
 					<v-btn v-on="on"
 							@click="setaddspr(true)"
