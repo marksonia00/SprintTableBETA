@@ -10,7 +10,7 @@
 		<div class="ml-4" v-if="subtitle != null">
             {{subtitle}}
         </div>
-		<template v-slot:extension v-if="title.page == 1 || title.page == 2">
+		<template v-slot:extension v-if="title.page == 0 || title.page == 1">
 			<v-row class="indigo lighten-1 flex-nowrap">
 				<v-col v-for="(state, stid) in mixin.state" :key="stid" style="max-height: 47px;">
 					<div class="title white--text" style="min-width: 245px; max-width: 245px;">
@@ -38,7 +38,26 @@
     </v-app-bar>
     <!-- ■■■■ Side drawer ■■■■ -->
     <v-navigation-drawer v-model="drawer" width="139" stateless app>
-        <v-list dense>
+		<template v-slot:prepend>
+			<v-list>
+				<v-list-item>
+					<v-avatar class="mr-2" color="indigo" size="36">
+						<span class="white--text headline">
+							{{logininfo.substr(0, 1).toUpperCase()}}
+						</span>
+					</v-avatar>					
+					<v-list-item-title class="title">{{logininfo}}</v-list-item-title>
+				</v-list-item>
+				<v-list-item>
+					<v-chip outlined @click="logout()" color="deep-orange darken-3" class="subtitle-2 text-center">
+						<v-icon left color="red">mdi-keyboard-return</v-icon>							
+						Sign Out
+					</v-chip> 
+				</v-list-item>
+			</v-list>
+		</template>
+      	<v-divider></v-divider>        
+	  	<v-list dense>
 			<v-list-item-group v-model="title.page" color="primary">
 				<v-list-item v-for="(nav, i) in navlist" :key="i" @click="listonclick(i)" :disabled="i == title.page">
 					<v-list-item-action>
@@ -89,9 +108,8 @@ import mixindata from './mixin/mixindata'
     },
     data: () => ({
 		infodialog: {info: false, infomsg: "", infotimeout: 3000},
-        title: {page: 1},
-        navlist: [  {title: 'Home', icon: 'mdi-home'}, 
-                    {title: 'Sprint', icon: 'mdi-expand-all'},
+        title: {page: 0},
+        navlist: [  {title: 'Sprint', icon: 'mdi-expand-all'},
 					{title: 'Owner', icon: 'mdi-account-multiple'},
                     {title: 'Task', icon: 'mdi-file-table-box-multiple'},
 					{title: 'Seal', icon: 'mdi-briefcase-edit'},
@@ -101,8 +119,25 @@ import mixindata from './mixin/mixindata'
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["tasklist", "addspr", "subtitle"])
+		...mapGetters(["logininfo", "tasklist", "addspr", "subtitle"])
 	},
+    methods:{
+		// ■■■■ Logout  ■■■■
+		logout(){
+			this._ajaxAction({api: 'logout'})
+			this.$router.push('/Home')
+		},
+        // ■■■■ Side drawer router  ■■■■
+        listonclick(page){ 
+			this.$router.push(`/index/${this.navlist[page].title}`)
+		},
+		...mapActions(['_ajaxAction', 'setaddspr'])
+	},
+	created(){
+		this.listonclick(0)
+	},
+  }
+	
 	// sockets: {
 	// 	connect: function () {
 	// 		console.log('socket connected')
@@ -117,17 +152,6 @@ import mixindata from './mixin/mixindata'
 	// 		this.focus[data.substr(7, 6)] = true	
 	// 	}
     // },
-    methods:{
-        // ■■■■ Side drawer router  ■■■■
-        listonclick(page){ 
-				this.$router.push(`/index/${this.navlist[page].title}`)
-		},
-		...mapActions(['changetitle', 'setaddspr'])
-	},
-	created(){
-		this.listonclick(1)
-	},
-  }
 
 
   		//■■■■ pure WebSocket ■■■■

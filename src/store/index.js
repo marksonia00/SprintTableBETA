@@ -11,39 +11,38 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state:{
-        logininfo:{},
-        logintoken:"",
-        tasklist: [],
-        subtitle: null, 
-        addspr: false
+        logininfo: null,           // login account
+        logintoken: null,          // login token
+        tasklist: [],              // task list from db
+        subtitle: null,            // Detail Sprint Name
+        addspr: false              // New Sprint Dialog Trigger
     },
     actions:{
-        // ■■ Signup ■■■■■■■■■■■
-        async signupAction(store, {acc, pwd}) {
+        
+        // ■■ Firebase API ■■■■■■■■■■■ api: signup, login, logout, certify ■■
+        async _ajaxAction(store, {api, acc, pwd}) {
             let result = ''
-            let postbody = `account=${acc}&password=${pwd}`
-            await axios.post(`${process.env.VUE_APP_firefx}/log/signup` , postbody)
-                .then(response => result = response.data)
+            let postbody = `account=${store.state.logininfo}&token=${store.state.logintoken}`   //acc&tok
+            if(api == 'signup' || api == 'login')    
+                postbody = `account=${acc}&password=${pwd}`
+            
+                await axios.post(`${process.env.VUE_APP_firefx}/log/${api}` , postbody)              //api
+                .then(response => {
+                    result = response.data
+                    if(response.data.code == 201){
+                        if(api == 'login'){
+                            store.commit('setlogininfo', acc)                    
+                            store.commit('setlogintoken', response.data.token)                    
+                        }
+                        else if(api == 'logout'){
+                            store.commit('setlogininfo', null)                                          //del acc
+                            store.commit('setlogintoken', null)                                         //del tok                  
+                        }
+                    }                
+                })
                 .catch(error => console.log(error))
             console.log(result)
             return result   
-        },
-
-        // ■■ Login ■■■■■■■■■■■
-        async loginAction(store, {acc, pwd}) {
-            let result = ''
-            let postbody = `account=${acc}&password=${pwd}`
-            await axios.post(`${process.env.VUE_APP_firefx}/log/login` , postbody)
-                .then(response => result = response.data)
-                .catch(error => console.log(error))
-            console.log(result)
-            // store.commit('setlogintoken', token)
-            return result   
-        },
-
-        // ■■ Logout ■■■■■■■■■■■
-        async logoutAction(store) {
-            store.commit('setlogintoken', "")
         },
 
         // ■■ taskinfo ■■■■■■■■■■■

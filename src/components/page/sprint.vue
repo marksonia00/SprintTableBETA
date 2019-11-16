@@ -118,7 +118,9 @@
                             <v-col :style="{minWidth: '245px', maxWidth: '245px', maxHeight: '128px', minHeight: '128px'}"
                                             class="overflow-auto">
                                 <v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
-                                        overlap color="blue-grey lighten-1" 
+                                        overlap 
+                                        :color="logininfo.substr(0, 1).toUpperCase() == task.OWNER.substr(0,1).toUpperCase()?
+                                                 'indigo' : 'blue-grey lighten-1' " 
                                         :class="{'mt-2': tkid < 1 }"
                                         :style="{opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
                                                 maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '100%'}"										
@@ -250,7 +252,7 @@ import mixindata from '../mixin/mixindata'
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["tasklist", "subtitle", "addspr"])
+		...mapGetters(["logininfo", "tasklist", "subtitle", "addspr"])
 	},
     methods:{
         // ■■■■ Filter task by "sprint" & "status" ■■■■

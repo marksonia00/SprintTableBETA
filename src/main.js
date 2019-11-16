@@ -28,7 +28,15 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-// router.beforeEach((to, from, next) => {
-//   store.state.logintoken != "" ? next() : next('/Home')
-// })
+router.beforeEach(async (to, from, next) => {
+  store.state.logintoken == null ? router.push('/') : next()
+})
 
+//todo  api: 'certify'
+//   let result = {}
+// if(store.state.logintoken == null){
+//   result = await store.dispatch('_ajaxAction', {api: 'certify'})
+//   result.code == 201 ? next() : next('/Home')
+// }
+// else
+//   next()
