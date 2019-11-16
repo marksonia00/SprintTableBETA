@@ -123,7 +123,7 @@
                                                  'indigo' : 'blue-grey lighten-1' " 
                                         :class="{'mt-2': tkid < 1 }"
                                         :style="{opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
-                                                maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '100%'}"										
+                                                maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '88%'}"										
                                         >
                                     <template v-slot:badge>
                                         <v-menu offset-y transition="slide-x-transition">
@@ -157,7 +157,7 @@
                                                 :color="mixin.prior[task.PRIORITY].color"
                                                 :style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`, 
                                                             opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
-                                                            maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '100%'}"																
+                                                            maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '93%'}"																
                                                 text-color="black"
                                                 class="body-1 mr-1 ml-3 mb-2" 
                                                 outlined								 
@@ -204,7 +204,7 @@
         <!-- ● delete dialog ● -->
         <v-dialog v-model="dialog.del" max-width="250">
             <v-card>
-                <v-card-title class="subtitle-1 red--text">Delete Task?</v-card-title>
+                <v-card-title class="subtitle-1 red--text">{{dialog.target.STATUS == 'DELETE' ? 'Delete Sprint?' :'Delete Task?'}}</v-card-title>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
