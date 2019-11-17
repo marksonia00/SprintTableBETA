@@ -115,7 +115,7 @@ export default {
 				newtask.PRIORITY = tk.PRIORITY
 				templist.push(Object.assign({}, newtask))
 			})
-			this.mixinUpdater('submitTask', templist, '')		//! => '../mixin/mixindata'
+			this.mixinUpdater('submitTask', templist, `${this.presprint.NAME} create`)	   //! => '../mixin/mixindata'
 			this.$emit('update:presprint', {})
 			this.$emit('update:pretask', {PRIORITY: 2})
 			this.setaddspr(false)

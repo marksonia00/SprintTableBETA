@@ -148,7 +148,7 @@ export default {
                 templist[index].MODTIME = new Date().toLocaleString()
             }   
 
-            this.mixinUpdater('submitTask', templist, '')     //! => '../mixin/mixindata'
+            this.mixinUpdater('submitTask', templist, `${this.task.NAME} ${type}`)     //! => '../mixin/mixindata'
             this.$emit('update:open', false)
             this.$emit('update:del', false)
         },

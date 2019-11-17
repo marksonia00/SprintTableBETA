@@ -13,7 +13,10 @@ export default new Vuex.Store({
     state:{
         logininfo: null,           // login account
         logintoken: null,          // login token
-        tasklist: [],              // task list from db
+        tasklist: {                // task list from db
+            tasklist: [],
+            notify: {news: false, msg: '', act: null}
+        },  
         subtitle: null,            // Detail Sprint Name
         addspr: false              // New Sprint Dialog Trigger
     },
@@ -35,8 +38,8 @@ export default new Vuex.Store({
                             store.commit('setlogintoken', response.data.token)                    
                         }
                         else if(api == 'logout'){
-                            store.commit('setlogininfo', null)                                          //del acc
-                            store.commit('setlogintoken', null)                                         //del tok                  
+                            store.commit('setlogininfo', null)                  //del acc
+                            store.commit('setlogintoken', null)                 //del tok                  
                         }
                     }                
                 })
@@ -46,7 +49,7 @@ export default new Vuex.Store({
         },
 
         // ■■ taskinfo ■■■■■■■■■■■
-        async gettaskinfo(store,id) {
+        async gettaskinfo(store) {
             let list = null;
             await fs.get()
                 .then(doc => list = doc.data())
@@ -57,17 +60,22 @@ export default new Vuex.Store({
         },
 
         // ■■ Upate List ■■■■■■■■■■■        
-        async updatelist(store, tasklist){ 
-            await fs.update({tasklist})
-            await store.dispatch('gettaskinfo')
+        async updatelist(store, {tasklist, msg, act}){ 
+            let notify = {news: true, act: act, msg: `${msg} by ${store.state.logininfo}`}
+            await fs.update({tasklist, notify})
+            // await store.dispatch('gettaskinfo')
         }, 
                
         // ■■ Realtime Binding List ■■■■■■■■■■■      
         bindListRef: firestoreAction(({ bindFirestoreRef }) => {
-            return bindFirestoreRef('tasklist', db.firestore().collection('tasklist').doc('v6EUv3f3LCTRQvB4fb0w'))
+            bindFirestoreRef('tasklist', db.firestore().collection('tasklist').doc('v6EUv3f3LCTRQvB4fb0w'))
         }),
+        unbindListRef: firestoreAction(({ unbindFirestoreRef }) => {
+            unbindFirestoreRef('tasklist', false)
+        }),
+        
 
-        // ● title unit ●
+        // ● big plus unit ●
         setaddspr(store, open) {
             store.commit('setaddspr', open)
         },
@@ -76,11 +84,17 @@ export default new Vuex.Store({
         setsubtitle(store, sub) {
             store.commit('setsubtitle', sub)
         },
+
+        // ● notify unit ●
+        setnotify(store, not){
+            store.commit('setnotify', not)
+        }
     },
     mutations:{
         setlogininfo: (state, res) => state.logininfo = res,
         setlogintoken: (state, res) => state.logintoken = res,
-        settasklist: (state, res) => state.tasklist = res,
+        settasklist: (state, res) => state.tasklist.tasklist = res, //! unsafe Solution
+        setnotify: (state, res) => state.tasklist.notify = res,
         setsubtitle: (state, res) => state.subtitle = res,
         setaddspr: (state, res) => state.addspr = res,
         ...vuexfireMutations
@@ -88,7 +102,8 @@ export default new Vuex.Store({
     getters:{
         logininfo: state => state.logininfo,
         logintoken: state => state.logintoken,
-        tasklist: state => state.tasklist,
+        tasklist: state => state.tasklist.tasklist,     //! unsafe Solution
+        notify: state => state.tasklist.notify,
         subtitle: state => state.subtitle,
         addspr: state => state.addspr
     }

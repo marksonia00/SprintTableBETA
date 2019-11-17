@@ -24,7 +24,7 @@
                     <!--● Edit Sprint : check ●-->
                     <v-tooltip top v-if="edit.sprint == sprint">  
                         <template v-slot:activator="{ on }">
-                            <v-btn text icon v-on="on" @click="sprintaction('edit', edit.value)">							
+                            <v-btn text icon v-on="on" @click="sprintaction('edit', sprint, edit.value)">							
                                 <v-icon color="green darken-1">mdi-check</v-icon>
                             </v-btn>
                         </template>
@@ -281,33 +281,24 @@ import mixindata from '../mixin/mixindata'
         },
 		// ■■■■ Title Action row ■■■■
 		sprintaction(type, spr, newspr){ 
-            let templist = this.tasklist               
-            if(type == 'edit'){
-                templist.filter(tk => tk.SPRINTID == spr).forEach(tk => tk.SPRINTID = newspr)
-                this.edit.sprint = null
-            }
-            else if(type == 'delete'){
-                if(this.dialog.task.SPRINTID != '1_STB維護' && this.dialog.task.SPRINTID != '2_學習地圖' && this.dialog.task.SPRINTID != '3_線上任務' )
+            let msg = ''
+            let templist = this.tasklist 
+            if(this.dialog.task.SPRINTID != '1_STB維護'){
+                if(type == 'edit'){
+                    templist.filter(tk => tk.SPRINTID == spr).forEach(tk => tk.SPRINTID = newspr)
+                    this.edit.sprint = null
+                    msg = `${spr} update name to ${newspr}`
+                }
+                else if(type == 'delete'){
                     templist.filter(tk => tk.SPRINTID.trim() == this.dialog.task.SPRINTID)
                                     .forEach(ftk => templist.splice(templist.findIndex(tk => tk.TASKID == ftk.TASKID), 1))
-                this.dialog = {open: false, task: {}, target: {}, del: false}
+                    msg = `${this.dialog.task.SPRINTID} delete`                    
+                    this.dialog = {open: false, task: {}, target: {}, del: false}
+                }
+                this.mixinUpdater('submitTask', templist, msg)                     //! => '../mixin/mixindata'
             }
-            this.mixinUpdater('submitTask', templist, '')                     //! => '../mixin/mixindata'
         },       
-		// ■■■■ Initialize ■■■■		
-		async initlist(){
-			this.overlay = true	
-			// let getList
-			// do{	getList = await this.gettaskinfo(0)}
-			// while( JSON.stringify(getList) == JSON.stringify(this.list.task) )
-            // this.list.task = getList
-            await this.gettaskinfo(0)			
-			this.overlay = false
-		},
-		...mapActions(["gettaskinfo", "setaddspr", "setsubtitle"])
-	},
-	created(){
-		this.initlist()		
+		...mapActions(["setaddspr", "setsubtitle"])
 	},
   }
 </script>

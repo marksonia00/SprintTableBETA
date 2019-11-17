@@ -76,14 +76,18 @@
 		<router-view />
 		<!-- ■■■■ Infomation Tag ■■■■ -->
 		<v-snackbar
-			v-model="infodialog.info" color="success"
-			vertical right top :timeout="infodialog.infotimeout"
+			v-model="notify.news" 
+			:color="notify.act == 0 ? 'success' : (notify.act == 1 ? 'amber' : 'red')"
+			vertical 
+			right 
+			top 
+			:timeout="3000"
 		>
-			{{ infodialog.infomsg }}
+			{{ notify.msg }}
 			<v-btn
 				color="indigo"
 				text
-				@click="infodialog.info = false"
+				@click="setnotify({news: false, msg: '', act: null})"
 			>
 				Close
       		</v-btn>
@@ -107,7 +111,6 @@ import mixindata from './mixin/mixindata'
       source: String,
     },
     data: () => ({
-		infodialog: {info: false, infomsg: "", infotimeout: 3000},
         title: {page: 0},
         navlist: [  {title: 'Sprint', icon: 'mdi-expand-all'},
 					{title: 'Owner', icon: 'mdi-account-multiple'},
@@ -119,7 +122,7 @@ import mixindata from './mixin/mixindata'
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["logininfo", "tasklist", "addspr", "subtitle"])
+		...mapGetters(["logininfo", "tasklist", "notify", "addspr", "subtitle"])
 	},
     methods:{
 		// ■■■■ Logout  ■■■■
@@ -131,11 +134,22 @@ import mixindata from './mixin/mixindata'
         listonclick(page){ 
 			this.$router.push(`/index/${this.navlist[page].title}`)
 		},
-		...mapActions(['_ajaxAction', 'setaddspr'])
+		async initlist(){
+			this.overlay = true
+			this.setnotify({news: false, msg: '', act: null})
+			this.bindListRef()
+			await this.gettaskinfo()
+			this.listonclick(0)		
+			this.overlay = false
+		},
+		...mapActions(['_ajaxAction', 'setaddspr', 'setnotify', 'bindListRef', 'unbindListRef', 'gettaskinfo'])
 	},
 	created(){
-		this.listonclick(0)
+		this.initlist()	
 	},
+	destroyed(){
+		this.unbindListRef()
+	}
   }
 	
 	// sockets: {

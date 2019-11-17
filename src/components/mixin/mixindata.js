@@ -48,24 +48,33 @@ export default {
 		mixinUpdater(type, data, offset){   // update center => vuex
             let templist = this.tasklist
             let index = null
+            let msg = ""
+            let act = null  // 0:Create 1:Update 2:Delete
             Array.isArray(data) ? true : index = this.tasklist.findIndex(tk => tk.TASKID == data)
             if(type == 'submitTask'){                   // *data from dialog & sprintActionBtn
                 templist = data
+                msg = offset
+                offset.includes('create')? act = 0 : ( offset.includes('delete')? act = 2 : act = 1)               
             }
             else if(type == 'dialogDelete'){            // *data from subdialog 'delete'
-                templist.splice(index, 1)                
+                msg = `${templist[index].NAME} deleted`                
+                templist.splice(index, 1)
+                act = 2
             }
 			else if(type == 'ownerTag'){                // *data from ownerTag		        
                 templist[index].OWNER = offset
                 templist[index].MODTIME = new Date().toLocaleString()
+                msg = `${templist[index].NAME} change Owner to ${offset}`
+                act = 1       
             }
             else if(type == 'dropStatus'){              // *data from dragdrop
                 templist[index].STATUS = offset
                 templist[index].MODTIME = new Date().toLocaleString()
-            }
-            
-            this.updatelist(templist)   //! => 'VUEX'
-				// this.$socket.emit('update', `update ${task.TASKID} ${task.NAME}`) 		// ! WebSocket Send! >>>>
+                msg = `${templist[index].NAME} change Status to ${this.mixin.state[offset].name}`
+                act = 1
+            }            
+            this.updatelist({tasklist: templist, msg: msg, act: act})   //! => 'VUEX'
+				// this.$socket.emit('update', `update ${task.TASKID} ${task.NAME}`)
         },
         ...mapActions(["updatelist"])
     },
