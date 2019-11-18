@@ -1,6 +1,42 @@
 <template>
 	<v-container fluid>
-
+		<v-row no-gutters 
+			v-for="(sprint, spid) 
+				in (Array.from(new Set(tasklist.map(task => task.SPRINTID.trim())
+												.filter(sp => seallist.includes(sp) )
+												.sort())))"     
+			:key="spid"
+		>
+		<v-col>
+			<!--● Seal Sprint ●-->
+			<v-tooltip top>  
+				<template v-slot:activator="{ on }">
+					<v-btn v-on="on" 
+						color="cyan" 
+						class="mr-3 white--text" 
+						icon
+						@click="unseal(sprint)"
+					>
+						<v-icon>mdi-package-up</v-icon>
+					</v-btn>
+				</template>
+				<span>Unseal</span>
+			</v-tooltip>
+			<!--● Delete Sprint ●-->
+			<v-tooltip top>  
+				<template v-slot:activator="{ on }">
+					<v-btn icon v-on="on" @click="dialog = {open: false, task: {SPRINTID: sprint}, target: {STATUS: 'DELETE'}, del: true}"
+							color="red accent-4" 
+							class="mr-3 white--text">
+						<v-icon>mdi-trash-can-outline</v-icon>
+					</v-btn>
+				</template>
+				<span>Delete</span>
+			</v-tooltip>
+			<span class="title">{{sprint}}</span>
+			<v-spacer></v-spacer> <!-- SPACER HERE !!!  -->			
+		</v-col>
+		</v-row>																
 	</v-container>
 </template>
 
@@ -17,10 +53,17 @@ export default {
 		sprintdialog: {presprint: {}, pretask: [{PRIORITY: 2}]},		
 	}),
 	computed:{
-		...mapGetters(["addspr"])
+		...mapGetters(["tasklist", "seallist", "addspr"])
 	},
 	methods:{
-		...mapActions(["setaddspr"])
+		//● unseal Sprint ●
+		unseal(spr){
+			let templist = this.seallist
+			let index = templist.findIndex(sp => sp == spr)
+			templist.splice(index, 1)
+			this.setseallist(templist)
+		},
+		...mapActions(["setaddspr", "setseallist"])
 	}
 }
 </script>

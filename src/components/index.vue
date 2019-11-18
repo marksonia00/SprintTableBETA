@@ -37,7 +37,7 @@
 		</template>
     </v-app-bar>
     <!-- ■■■■ Side drawer ■■■■ -->
-    <v-navigation-drawer v-model="drawer" width="139" stateless app>
+    <v-navigation-drawer v-model="drawer" width="141" stateless app>
 		<template v-slot:prepend>
 			<v-list>
 				<v-list-item>
@@ -112,11 +112,11 @@ import mixindata from './mixin/mixindata'
     },
     data: () => ({
         title: {page: 0},
-        navlist: [  {title: 'Sprint', icon: 'mdi-expand-all'},
-					{title: 'Owner', icon: 'mdi-account-multiple'},
-                    {title: 'Task', icon: 'mdi-file-table-box-multiple'},
-					{title: 'Seal', icon: 'mdi-briefcase-edit'},
-					{title: 'Timeline', icon: 'mdi-progress-clock'}
+        navlist: [  {title: 'Sprint', route: 'Sprint', icon: 'mdi-expand-all'},
+					{title: 'MyTask', route: 'Owner', icon: 'mdi-account-multiple'},
+                    {title: 'Detail', route: 'Task', icon: 'mdi-file-table-box-multiple'},
+					{title: 'Sealed', route: 'Seal', icon: 'mdi-package-down'},
+					{title: 'Timeline', route: 'Timeline', icon: 'mdi-progress-clock'}
 				],
 		drawer: true,
 		overlay: false,
@@ -132,7 +132,7 @@ import mixindata from './mixin/mixindata'
 		},
         // ■■■■ Side drawer router  ■■■■
         listonclick(page){ 
-			this.$router.push(`/index/${this.navlist[page].title}`)
+			this.$router.push(`/index/${this.navlist[page].route}`)
 		},
 		async initlist(){
 			this.overlay = true

@@ -117,7 +117,7 @@ export default {
 			})
 			this.mixinUpdater('submitTask', templist, `${this.presprint.NAME} create`)	   //! => '../mixin/mixindata'
 			this.$emit('update:presprint', {})
-			this.$emit('update:pretask', {PRIORITY: 2})
+			this.$emit('update:pretask', [{PRIORITY: 2}])
 			this.setaddspr(false)
 		},
 		...mapActions(["setaddspr"])

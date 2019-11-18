@@ -4,7 +4,9 @@
         <v-row no-gutters 
             v-for="(sprint, spid) 
                     in (subtitle != null ? [subtitle] 
-                        : Array.from(new Set(tasklist.map(task => task.SPRINTID.trim()).sort())))" :key="spid">
+                        : Array.from(new Set(tasklist.map(task => task.SPRINTID.trim())
+                                                    .filter(sp => !seallist.includes(sp) )
+                                                    .sort())))"     :key="spid">
             <v-col>
                 <!-- ● Title action row ● -->
                 <v-row>
@@ -65,7 +67,13 @@
                     <!--● Seal Sprint ●-->
                     <v-tooltip top>  
                         <template v-slot:activator="{ on }">
-                            <v-btn v-on="on" color="orange accent-4" class="mr-3 white--text" icon><v-icon>mdi-package-down</v-icon></v-btn>
+                            <v-btn icon v-on="on" 
+                                color="orange accent-4" 
+                                class="mr-3 white--text" 
+                                @click="setseallist(seallist.concat([sprint]))"
+                            >
+                                <v-icon>mdi-package-down</v-icon>
+                            </v-btn>
                         </template>
                         <span>Seal</span>
                     </v-tooltip>
@@ -100,14 +108,11 @@
                                     :style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`}">
                                     <v-list-item dense>
                                         <v-list-item-content>
-                                            <div class="overline">{{task.TASKID}}</div>
+                                            <v-row no-gutters class="overline">
+                                                <v-col> {{`${task.REMAININGPOINT} / ${task.TOTALPOINT}`}} </v-col>
+                                                <v-col class="text-right">{{task.OWNER}}</v-col>
+                                            </v-row>
                                             <v-list-item-title class="body-1">{{task.NAME}}</v-list-item-title>
-                                        </v-list-item-content>
-                                        <v-list-item-content>
-                                            <div class="overline text-right">
-                                                {{`${task.REMAININGPOINT} / ${task.TOTALPOINT}`}}
-                                            </div>
-                                            <v-list-item-title class="body-1 text-right">{{task.OWNER}}</v-list-item-title>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-card>								
@@ -252,7 +257,7 @@ import mixindata from '../mixin/mixindata'
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["logininfo", "tasklist", "subtitle", "addspr"])
+		...mapGetters(["logininfo", "tasklist", "seallist", "subtitle", "addspr"])
 	},
     methods:{
         // ■■■■ Filter task by "sprint" & "status" ■■■■
@@ -298,7 +303,7 @@ import mixindata from '../mixin/mixindata'
                 this.mixinUpdater('submitTask', templist, msg)                     //! => '../mixin/mixindata'
             }
         },       
-		...mapActions(["setaddspr", "setsubtitle"])
+		...mapActions(["setaddspr", "setsubtitle", "setseallist"])
 	},
   }
 </script>

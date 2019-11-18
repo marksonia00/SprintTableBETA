@@ -6,6 +6,7 @@ import { vuexfireMutations, firestoreAction } from 'vuexfire'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 const fs = db.firestore().collection('tasklist').doc('v6EUv3f3LCTRQvB4fb0w')
+const bs = db.firestore().collection('backuplist').doc('6kc7ZLATTsHonYEmF3Wm')  //! BackUP doc
 
 Vue.use(Vuex)
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
         logintoken: null,          // login token
         tasklist: {                // task list from db
             tasklist: [],
+            seallist: [],
             notify: {news: false, msg: '', act: null}
         },  
         subtitle: null,            // Detail Sprint Name
@@ -60,9 +62,12 @@ export default new Vuex.Store({
         },
 
         // ■■ Upate List ■■■■■■■■■■■        
-        async updatelist(store, {tasklist, msg, act}){ 
-            let notify = {news: true, act: act, msg: `${msg} by ${store.state.logininfo}`}
-            await fs.update({tasklist, notify})
+        async updatelist(store, {tasklist, msg, act}){
+            let notify = {news: true, act: act, msg: `${msg} by ${store.state.logininfo}`}  //set notify
+            let seallist = store.state.tasklist.seallist
+            store.state.logininfo == 'bkadmin' ?
+            await bs.update({tasklist, notify, seallist}) :
+            await fs.update({tasklist, notify, seallist})            
             // await store.dispatch('gettaskinfo')
         }, 
                
@@ -88,6 +93,10 @@ export default new Vuex.Store({
         // ● notify unit ●
         setnotify(store, not){
             store.commit('setnotify', not)
+        },
+
+        setseallist(store, seal){
+            store.commit('setseallist', seal)
         }
     },
     mutations:{
@@ -95,6 +104,7 @@ export default new Vuex.Store({
         setlogintoken: (state, res) => state.logintoken = res,
         settasklist: (state, res) => state.tasklist.tasklist = res, //! unsafe Solution
         setnotify: (state, res) => state.tasklist.notify = res,
+        setseallist: (state, res) => state.tasklist.seallist = res,
         setsubtitle: (state, res) => state.subtitle = res,
         setaddspr: (state, res) => state.addspr = res,
         ...vuexfireMutations
@@ -104,6 +114,7 @@ export default new Vuex.Store({
         logintoken: state => state.logintoken,
         tasklist: state => state.tasklist.tasklist,     //! unsafe Solution
         notify: state => state.tasklist.notify,
+        seallist: state => state.tasklist.seallist,
         subtitle: state => state.subtitle,
         addspr: state => state.addspr
     }
