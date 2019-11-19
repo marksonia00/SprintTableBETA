@@ -14,11 +14,6 @@ Vue.use(VueRouter)
 		component: () => import('../components/login.vue')
 	},
 	{
-		path: '/vuetifytest', 
-		name: 'vuetifyTest',
-		component: () => import('../components/vuetifyTest.vue')
-	},
-	{
 		path: '/index',
 		name: 'index',
 		component: () => import('../components/index.vue'),
