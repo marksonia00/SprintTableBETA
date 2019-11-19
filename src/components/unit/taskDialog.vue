@@ -97,7 +97,7 @@
         <v-card-actions> <!-- dialog actions -->
             <v-spacer></v-spacer>
             <v-btn color="red darken-1" text 
-                    @click="$emit('update:del', true)" 
+                    @click="dialog.del=true" 
                     :disabled="typeof target == 'string'">
                     Delete
             </v-btn>
@@ -111,19 +111,29 @@
                     Save
             </v-btn>
         </v-card-actions>
+        <!-- ● delete dialog ● -->
+        <v-dialog v-model="dialog.del" max-width="250">
+            <delDialog 
+				@callback="submitTask('delete')" 
+				@dismiss="dialog.del=false"
+			/>
+        </v-dialog>
     </v-card>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import mixindata from '../mixin/mixindata'
+import delDialog from './delDialog'
 
 export default {
     name: 'taskDialog',
     mixins: [mixindata],
-    props: ['open', 'task', 'target', 'del'],
+    components: { delDialog },
+    props: ['open', 'task', 'target'],
     data: () => ({
         rule: {valid: true}, 
+        dialog: {del: false}
     }),
 	computed:{
         ...mapGetters(["tasklist"]),
@@ -132,6 +142,7 @@ export default {
 		// ■■■■ Set task ■■■■
 		submitTask(type){
             let templist = this.tasklist
+            let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
             if(type == 'create'){                     //* create 
                 let tentid = this.tasklist.filter(tk => tk.SPRINTID.trim() == this.target)
                                             .map(tk => parseInt(tk.TASKID.trim(), 10))
@@ -143,14 +154,14 @@ export default {
                 templist.push(Object.assign({}, newtask))
             }
             else if(type == 'update'){                  //* update
-                let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
                 templist[index] = Object.assign({}, this.task)
                 templist[index].MODTIME = new Date().toLocaleString()
-            }   
-
+            }
+            else if(type == 'delete'){                 //* delete
+                templist.splice(index, 1)
+            } 
             this.mixinUpdater('submitTask', templist, `${this.task.NAME} ${type}`)     //! => '../mixin/mixindata'
             this.$emit('update:open', false)
-            this.$emit('update:del', false)
         },
     }
 }

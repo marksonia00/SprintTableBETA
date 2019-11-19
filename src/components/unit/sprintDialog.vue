@@ -12,7 +12,8 @@
 							<v-text-field 
 								label="Sprint Name*" 
 								v-model="presprint.NAME" 
-								:rules="[v => !!v || 'Name is required']"
+								:rules="[v => !!v || 'Name is required',
+										v => !Array.from(new Set(tasklist.map(tk => tk.SPRINTID.trim()))).includes(v) || 'Duplicate Name']"
 								required
 								clearable
 							></v-text-field>

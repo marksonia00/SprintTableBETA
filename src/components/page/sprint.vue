@@ -208,27 +208,10 @@
 
         <!-- ● delete dialog ● -->
         <v-dialog v-model="dialog.del" max-width="250">
-            <v-card>
-                <v-card-title class="subtitle-1 red--text">{{dialog.target.STATUS == 'DELETE' ? 'Delete Sprint?' :'Delete Task?'}}</v-card-title>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="dialog.del = false"
-                    >
-                        Cancel
-                    </v-btn>
-                    <v-btn
-                        color="red darken-1"
-                        text
-                        @click="dialog.target.STATUS == 'DELETE' ?
-                                sprintaction('delete') : deletetask()"                                   
-                    >
-                        Delete
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
+            <delDialog 
+				@callback="sprintaction('delete')" 
+				@dismiss="dialog.del=false"
+			/>
         </v-dialog>
         
         <v-overlay :value="overlay">
@@ -239,15 +222,15 @@
 </template>
 
 <script>
-import { log } from 'util'
 import taskDialog from '../unit/taskDialog'
 import sprintDialog from '../unit/sprintDialog'
+import delDialog from '../unit/delDialog'
 import { mapGetters, mapActions } from "vuex"
 import mixindata from '../mixin/mixindata'
 
   export default {
     name: 'Sprint',
-    components: { taskDialog, sprintDialog },
+    components: { taskDialog, sprintDialog, delDialog },
     mixins: [mixindata],
     data: () => ({
 		focus: {owner: null},
@@ -260,7 +243,7 @@ import mixindata from '../mixin/mixindata'
 		...mapGetters(["logininfo", "tasklist", "seallist", "subtitle", "addspr"])
 	},
     methods:{
-        // ■■■■ Filter task by "sprint" & "status" ■■■■
+        // ■■■■ task filter by "sprint" & "status" ■■■■
 		taskfilter(sprint, state){
 			return this.tasklist.filter(task => task.SPRINTID.trim() == sprint && task.STATUS == state)
 		},
@@ -279,12 +262,7 @@ import mixindata from '../mixin/mixindata'
         dragend(event){
             event.dataTransfer.clearData()
         },
-        // ■■■■ Delete dialog ■■■■
-        deletetask(){                                                         //! => '../mixin/mixindata'
-            this.mixinUpdater('dialogDelete', this.dialog.task.TASKID, '')
-            this.dialog = {open: false, task: {}, target: {}, del: false}
-        },
-		// ■■■■ Title Action row ■■■■
+		// ■■■■ Title Action row ■■■■   type: edit, delete
 		sprintaction(type, spr, newspr){ 
             let msg = ''
             let templist = this.tasklist 

@@ -34,9 +34,7 @@
 			<v-spacer class="grey lighten-3"></v-spacer> <!-- SPACER HERE !!! -->								
 		</v-row>
         <!-- ■■ taskDialog component ■■ -->
-        <v-dialog 
-            v-model="dialog.open" 
-            max-width="600px">
+        <v-dialog v-model="dialog.open" max-width="600px">
 			<taskDialog v-bind.sync="dialog" />
 		</v-dialog>
 	</v-container>
