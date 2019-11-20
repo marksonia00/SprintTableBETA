@@ -163,12 +163,13 @@
                                         <template v-slot:activator="{ on }">											
                                             <v-chip 											
                                                 :color="mixin.prior[task.PRIORITY].color"
-                                                :style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`, 
+                                                :style="{border: `1px ${mixin.prior[task.PRIORITY].color} solid`,
+                                                            borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`, 
                                                             opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
-                                                            maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '93%'}"																
+                                                            maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '88%' : '93%',
+                                                            backgroundColor: 'white'}"																
                                                 text-color="black"
                                                 class="body-1 mr-1 ml-3 mb-2" 
-                                                outlined								 
                                                 label	
                                                 draggable
                                                 :title="task.NAME"
@@ -180,7 +181,7 @@
                                                 <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}"
                                                         :style="{maxWidth: '100%'}">
                                                     {{task.NAME}}
-                                                </span>
+                                                </span>        <!-- transitionname HERE !!! -->
                                             </v-chip>												
                                         </template>
                                         <span class="subtitle-1"><v-icon>mdi-hand-pointing-down</v-icon> &emsp; Update</span>
