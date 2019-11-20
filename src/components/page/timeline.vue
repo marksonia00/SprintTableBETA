@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        
+
     </v-container>
 </template>
 
@@ -11,7 +11,6 @@ export default {
       source: String,
     },
     data: () => ({
-
     })
 }
 </script>

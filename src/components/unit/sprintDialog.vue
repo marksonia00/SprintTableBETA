@@ -106,6 +106,7 @@ export default {
 			let tentid = this.tasklist.map(tk => parseInt(tk.TASKID.trim(), 10))
 										.reduce((now, next) => next > now ? next : now)						
 			let newtask = Object.assign({}, this.mixin.preaddtask) 
+			let id = (tentid - tentid % 100 + 100 + 1).toString()
 			newtask.SPRINTID = this.presprint.NAME,
 			newtask.MODTIME = new Date().toLocaleString()
 
@@ -116,7 +117,7 @@ export default {
 				newtask.PRIORITY = tk.PRIORITY
 				templist.push(Object.assign({}, newtask))
 			})
-			this.mixinUpdater('submitTask', templist, `${this.presprint.NAME} create`)	   //! => '../mixin/mixindata'
+			this.mixinUpdater('submitTask', {list: templist, id: id}, `${this.presprint.NAME} create`)	   //! => '../mixin/mixindata'
 			this.$emit('update:presprint', {})
 			this.$emit('update:pretask', [{PRIORITY: 2}])
 			this.setaddspr(false)

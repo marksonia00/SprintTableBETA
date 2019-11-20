@@ -143,6 +143,7 @@ export default {
 		submitTask(type){
             let templist = this.tasklist
             let index = this.tasklist.findIndex(tk => tk.TASKID == this.target.TASKID) 
+            let id = null
             if(type == 'create'){                     //* create 
                 let tentid = this.tasklist.filter(tk => tk.SPRINTID.trim() == this.target)
                                             .map(tk => parseInt(tk.TASKID.trim(), 10))
@@ -152,15 +153,17 @@ export default {
                 newtask.SPRINTID = this.target
                 newtask.MODTIME = new Date().toLocaleString()
                 templist.push(Object.assign({}, newtask))
+                id = newtask.TASKID
             }
             else if(type == 'update'){                  //* update
                 templist[index] = Object.assign({}, this.task)
                 templist[index].MODTIME = new Date().toLocaleString()
+                id = templist[index].TASKID
             }
             else if(type == 'delete'){                 //* delete
                 templist.splice(index, 1)
             } 
-            this.mixinUpdater('submitTask', templist, `${this.task.NAME} ${type}`)     //! => '../mixin/mixindata'
+            this.mixinUpdater('submitTask', {list: templist, id: id}, `${this.task.NAME} ${type}`)     //! => '../mixin/mixindata'
             this.$emit('update:open', false)
         },
     }

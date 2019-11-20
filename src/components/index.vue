@@ -74,23 +74,24 @@
     <v-content>
 		<!-- ■■■■ Router-View ■■■■ -->
 		<router-view />
-		<!-- ■■■■ Infomation Tag ■■■■ -->
+		<!-- ■■■■ Infomation Tag ■■■■  v-model to compute:"isnotify" -->
+					<!-- @input="setnotify({news: false, msg: '', act: null, id: notify.id})" -->
 		<v-snackbar
-			v-model="notify.news" 
-			:color="notify.act == 0 ? 'success' : (notify.act == 1 ? 'amber' : 'red')"
+			v-model="notify.news" 	
+			:color="notify.act == 0 ? 'success' : (notify.act == 1 ? 'amber darken-3' : 'red')"
 			vertical 
 			right 
 			top 
-			:timeout="3000"
+			:timeout="5000"
 		>
-			{{ notify.msg }}
+			<span class="subtitle-1">{{ notify.msg }}</span>
 			<v-btn
-				color="indigo"
+				color="white"
 				text
-				@click="setnotify({news: false, msg: '', act: null})"
+				@click="setnotify({news: false, msg: '', act: null, id: notify.id})"
 			>
 				Close
-      		</v-btn>
+			</v-btn>
     	</v-snackbar>
     </v-content>
 	<v-overlay :value="overlay">
@@ -136,7 +137,7 @@ import mixindata from './mixin/mixindata'
 		},
 		async initlist(){
 			this.overlay = true
-			this.setnotify({news: false, msg: '', act: null})
+			this.setnotify({news: false, msg: '', act: null, id: null})
 			this.bindListRef()
 			await this.gettaskinfo()
 			this.listonclick(0)		

@@ -60,9 +60,9 @@ export default {
 	},
 	methods:{
 		taskfilter(state){
-			return this.tasklist.filter(tk => tk.OWNER.trim() == this.logininfo 			// filter OWNER
-												&& tk.STATUS == state 						// Sort STATUS
-												&& !this.seallist.includes(tk.SPRINTID) )	// Not Sealed	
+			return this.tasklist.filter(tk => tk.OWNER.substr(0, 1).toUpperCase() == this.logininfo.substr(0, 1).toUpperCase() 	// filter OWNER
+												&& tk.STATUS == state 													// Sort STATUS
+												&& !this.seallist.includes(tk.SPRINTID) )								// Not Sealed	
 		},
         // ■■■■ Drag drop handle ■■■■
         dragstart(event, task){
@@ -71,7 +71,7 @@ export default {
         },
         drop(event, stid){
             if(event.dataTransfer.getData('status') != stid )
-				this.mixinUpdater('dropStatus', event.dataTransfer.getData('taskid'), stid)   //! => '../mixin/mixindata'
+				this.mixinUpdater('dropStatus', {list: null, id: event.dataTransfer.getData('taskid')}, stid)   //! => '../mixin/mixindata'
         },
         dragend(event){
             event.dataTransfer.clearData()

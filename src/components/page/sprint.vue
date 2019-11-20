@@ -149,14 +149,17 @@
                                                     <v-list-item v-for="(member, mid) in Array.from(new Set(tasklist.map(task => task.OWNER.trim()).sort()))" 
                                                                 :key="mid" 
                                                                 :value="member"
-                                                                @click="mixinUpdater('ownerTag', task.TASKID, member)">
+                                                                @click="mixinUpdater('ownerTag', {list: null, id: task.TASKID}, member)">
                                                         <v-list-item-title>{{ member }}</v-list-item-title>
                                                     </v-list-item>
                                                 </v-list-item-group>
                                             </v-list>
                                         </v-menu>	
                                     </template>
-                                    <v-tooltip top v-model="focus[task.TASKID.trim()]" color="yellow accent-4">  
+                                    <v-tooltip 
+                                        top
+                                        v-model="isUpdate[task.TASKID.trim()]" 
+                                        color="yellow darken-4">  
                                         <template v-slot:activator="{ on }">											
                                             <v-chip 											
                                                 :color="mixin.prior[task.PRIORITY].color"
@@ -171,7 +174,7 @@
                                                 :title="task.NAME"
                                                 @dragstart="dragstart($event, task)"
                                                 @dragend="dragend"	
-                                                @mousemove="focus[task.TASKID.trim()] == true ? focus = {owner: null} : true"																			
+                                                @mouseover="isUpdate[task.TASKID.trim()] ? setnotify({news: notify.news, msg: notify.msg, act: notify.act, id: null}) : false"																			
                                                 @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
                                             >															
                                                 <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}"
@@ -180,7 +183,7 @@
                                                 </span>
                                             </v-chip>												
                                         </template>
-                                        <span v-if="focus[task.TASKID.trim()]">Update</span>
+                                        <span class="subtitle-1"><v-icon>mdi-hand-pointing-down</v-icon> &emsp; Update</span>
                                     </v-tooltip>	
                                 </v-badge>
                             </v-col>
@@ -240,7 +243,12 @@ import mixindata from '../mixin/mixindata'
 		overlay: false,
 	}), 
 	computed:{
-		...mapGetters(["logininfo", "tasklist", "seallist", "subtitle", "addspr"])
+        isUpdate: function(){
+            let noti = {}
+            noti[this.notify.id] = true 
+            return noti       
+        },
+		...mapGetters(["logininfo", "tasklist", "seallist", "subtitle", "addspr", "notify"])
 	},
     methods:{
         // ■■■■ task filter by "sprint" & "status" ■■■■
@@ -256,7 +264,7 @@ import mixindata from '../mixin/mixindata'
         drop(event, stid, sprint){
             if(event.dataTransfer.getData('status') != stid 
                 && event.dataTransfer.getData('sprint') == sprint){
-				    this.mixinUpdater('dropStatus', event.dataTransfer.getData('taskid'), stid)   //! => '../mixin/mixindata'
+				    this.mixinUpdater('dropStatus', {list: null, id: event.dataTransfer.getData('taskid')}, stid)   //! => '../mixin/mixindata'
 			}
         },
         dragend(event){
@@ -278,10 +286,10 @@ import mixindata from '../mixin/mixindata'
                     msg = `${this.dialog.task.SPRINTID} delete`                    
                     this.dialog = {open: false, task: {}, target: {}, del: false}
                 }
-                this.mixinUpdater('submitTask', templist, msg)                     //! => '../mixin/mixindata'
+                this.mixinUpdater('submitTask', {list: templist, id: null}, msg)                     //! => '../mixin/mixindata'
             }
         },       
-		...mapActions(["setaddspr", "setsubtitle", "setseallist"])
+		...mapActions(["setaddspr", "setsubtitle", "setseallist", "setnotify"])
 	},
   }
 </script>

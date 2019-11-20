@@ -50,16 +50,11 @@ export default {
             let index = null
             let msg = ""
             let act = null  // 0:Create 1:Update 2:Delete
-            Array.isArray(data) ? true : index = this.tasklist.findIndex(tk => tk.TASKID == data)
+            data.id != null ? index = this.tasklist.findIndex(tk => tk.TASKID == data.id) : true
             if(type == 'submitTask'){                   // *data from dialog & sprintActionBtn
-                templist = data
+                templist = data.list
                 msg = offset
                 offset.includes('create')? act = 0 : ( offset.includes('delete')? act = 2 : act = 1)               
-            }
-            else if(type == 'dialogDelete'){            // *data from subdialog 'delete'
-                msg = `${templist[index].NAME} deleted`                
-                templist.splice(index, 1)
-                act = 2
             }
 			else if(type == 'ownerTag'){                // *data from ownerTag		        
                 templist[index].OWNER = offset
@@ -73,7 +68,7 @@ export default {
                 msg = `${templist[index].NAME} change Status to ${this.mixin.state[offset].name}`
                 act = 1
             }            
-            this.updatelist({tasklist: templist, msg: msg, act: act})   //! => 'VUEX'
+            this.updatelist({tasklist: templist, msg: msg, act: act, id: data.id})   //! => 'VUEX'
 				// this.$socket.emit('update', `update ${task.TASKID} ${task.NAME}`)
         },
         ...mapActions(["updatelist"])

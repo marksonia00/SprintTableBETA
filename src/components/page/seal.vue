@@ -83,7 +83,7 @@ export default {
 				this.unseal(this.dialog.task.SPRINTID)               
 				this.dialog = {open: false, task: {}, target: {}, del: false}
 			}
-            this.mixinUpdater('submitTask', templist, msg)                     //! => '../mixin/mixindata'
+            this.mixinUpdater('submitTask', {list: templist, id: null}, msg)                     //! => '../mixin/mixindata'
 		},
 		...mapActions(["setseallist"])
     },       
