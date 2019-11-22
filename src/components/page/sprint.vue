@@ -256,21 +256,6 @@ import mixindata from '../mixin/mixindata'
 		taskfilter(sprint, state){
 			return this.tasklist.filter(task => task.SPRINTID.trim() == sprint && task.STATUS == state)
 		},
-        // ■■■■ Drag drop handle ■■■■
-        dragstart(event, task){
-			event.dataTransfer.setData('taskid', task.TASKID)
-			event.dataTransfer.setData('status', task.STATUS)
-			event.dataTransfer.setData('sprint', task.SPRINTID)
-        },
-        drop(event, stid, sprint){
-            if(event.dataTransfer.getData('status') != stid 
-                && event.dataTransfer.getData('sprint') == sprint){
-				    this.mixinUpdater('dropStatus', {list: null, id: event.dataTransfer.getData('taskid')}, stid)   //! => '../mixin/mixindata'
-			}
-        },
-        dragend(event){
-            event.dataTransfer.clearData()
-        },
 		// ■■■■ Title Action row ■■■■   type: edit, delete
 		sprintaction(type, spr, newspr){ 
             let msg = ''
@@ -288,7 +273,7 @@ import mixindata from '../mixin/mixindata'
                     this.dialog = {open: false, task: {}, target: {}, del: false}
                 }
                 this.mixinUpdater('submitTask', {list: templist, id: null}, msg)                     //! => '../mixin/mixindata'
-            }
+            }//hhh
         },       
 		...mapActions(["setaddspr", "setsubtitle", "setseallist", "setnotify"])
 	},

@@ -5,10 +5,10 @@ export default {
         mixin: {    // static data storage
             member: [],
             state: [
-				{value: 0, name: "to do", color: "teal accent-4"}, 
-				{value: 1, name: "in process", color: "light-blue accent-4"}, 
-				{value: 2, name: "checking", color: "amber accent-4"}, 
-				{value: 3, name: "done", color: "light-green accent-4"}, 
+				{value: 0, name: "to do",   color: "#757575"}, 
+				{value: 1, name: "in process", color: "#0277BD"}, 
+				{value: 2, name: "checking", color: "#FF6D00"}, 
+				{value: 3, name: "done",    color: "#00C853"}, 
 			], 
             prior: [
 				{value: 0, name: 'Highest', color: '#E53935'}, 
@@ -44,6 +44,23 @@ export default {
             this.mixin.member.push(this.mixin.value): 
             this.mixin.value = ''
         },
+
+        // ■■■■ Drag drop handle ■■■■
+        dragstart(event, task){
+			event.dataTransfer.setData('taskid', task.TASKID)
+			event.dataTransfer.setData('status', task.STATUS)
+			event.dataTransfer.setData('sprint', task.SPRINTID)
+        },
+        drop(event, stid, sprint){
+            if(event.dataTransfer.getData('status') != stid 
+                && (event.dataTransfer.getData('sprint') == sprint || sprint == null)){
+				    this.mixinUpdater('dropStatus', {list: null, id: event.dataTransfer.getData('taskid')}, stid)   //! => '../mixin/mixindata'
+			}
+        },
+        dragend(event){
+            event.dataTransfer.clearData()
+        },
+
 		// ■■■■ Data Access ■■■■
 		mixinUpdater(type, data, offset){   // update center => vuex
             let templist = this.tasklist

@@ -3,7 +3,7 @@
 		<v-row class="flex-nowrap overflow-auto">
 			<v-col class="grey lighten-3" v-for="(state, stid) in mixin.state" :key="stid"
 					data-role="drag-drop-container" 
-					@drop="drop($event, stid)" 
+					@drop="drop($event, stid, null)" 
 					@dragover.prevent
 			>
 				<!-- ● inner page : View detail ● -->
@@ -16,7 +16,7 @@
 							draggable
 							@click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"
 							@dragstart="dragstart($event, task)"
-							@dragend="dragend()"
+							@dragend="dragend"
 							:style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`}">
 							<v-list-item dense>
 								<v-list-item-content>
@@ -64,18 +64,6 @@ export default {
 												&& tk.STATUS == state 													// Sort STATUS
 												&& !this.seallist.includes(tk.SPRINTID) )								// Not Sealed	
 		},
-        // ■■■■ Drag drop handle ■■■■
-        dragstart(event, task){
-			event.dataTransfer.setData('taskid', task.TASKID)
-			event.dataTransfer.setData('status', task.STATUS)
-        },
-        drop(event, stid){
-            if(event.dataTransfer.getData('status') != stid )
-				this.mixinUpdater('dropStatus', {list: null, id: event.dataTransfer.getData('taskid')}, stid)   //! => '../mixin/mixindata'
-        },
-        dragend(event){
-            event.dataTransfer.clearData()
-        },
 	}
 }
 </script>
