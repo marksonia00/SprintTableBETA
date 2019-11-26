@@ -18,23 +18,23 @@
                                 clearable
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="6" sm="2" md="2">                          <!-- REMAININGPOINT -->
+                        <v-col cols="3" sm="2" md="2">                          <!-- REMAININGPOINT -->
                             <v-text-field 
-                                label="Remain pt*" 
+                                :label="$vuetify.breakpoint.smAndDown? 'Rpt*' : 'Remain pt*' " 
                                 type="number" 
                                 v-model="task.REMAININGPOINT" 
                                 required>
                             </v-text-field>
                         </v-col>
-                        <v-col cols="6" sm="2" md="2">                          <!-- TOTALPOINT -->
+                        <v-col cols="3" sm="2" md="2">                          <!-- TOTALPOINT -->
                             <v-text-field 
-                                label="Total pt*" 
+                                :label="$vuetify.breakpoint.smAndDown? 'Tpt*' : 'Total pt*' "
                                 type="number" 
                                 v-model="task.TOTALPOINT" 
                                 required 
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">          <!-- OWNER -->
+                        <v-col cols="6" sm="6" md="4">          <!-- OWNER -->
                             <v-select 
                                 label="Owner*" 
                                 :items="mixin.member" 
@@ -57,7 +57,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">           <!-- Priority -->
+                        <v-col cols="6" sm="6" md="4">           <!-- Priority -->
                             <v-select 
                                 label="Priority" 
                                 item-text="name"
@@ -73,7 +73,7 @@
                             </template>
                             </v-select>									
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">                         <!-- Status -->
+                        <v-col cols="6" sm="6" md="4">                         <!-- Status -->
                             <v-select 
                                 label="Status" 
                                 item-text="name"

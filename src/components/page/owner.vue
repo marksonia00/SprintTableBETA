@@ -1,7 +1,8 @@
 <template>
 	<v-container class="fill-height d-flex align-start" fluid>
-		<v-row class="flex-nowrap overflow-auto">
-			<v-col class="grey lighten-3" v-for="(state, stid) in mixin.state" :key="stid"
+		<v-row	v-if="!$vuetify.breakpoint.smAndDown" 
+				class="flex-nowrap overflow-auto">
+			<v-col  class="grey lighten-3" v-for="(state, stid) in mixin.state" :key="stid"
 					data-role="drag-drop-container" 
 					@drop="drop($event, stid, null)" 
 					@dragover.prevent
@@ -31,6 +32,34 @@
 					</v-col>
 				</v-row>
 			</v-col>
+		</v-row>
+		<v-row>
+			<v-carousel 
+				v-if="$vuetify.breakpoint.smAndDown"
+				class="grey lighten-3" 
+				v-model="carousel"
+				light 
+				hide-delimiters
+			>
+				<v-carousel-item v-for="(state, stid) in mixin.state" :key="stid">
+					<v-col>
+						<v-card class="mx-auto" width="257" 
+							v-for="(task, tkid) in taskfilter(stid)" 
+							:key="tkid" 
+							@click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"
+							:style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`}">
+							<v-list-item dense>
+								<v-list-item-content>
+									<v-row no-gutters class="overline">
+										<v-col>{{task.SPRINTID}}</v-col>
+										<v-col class="text-right"> {{`${task.REMAININGPOINT} / ${task.TOTALPOINT}`}} </v-col>
+									</v-row>
+									<v-list-item-title class="body-1">{{task.NAME}}</v-list-item-title>
+								</v-list-item-content>
+							</v-list-item>
+						</v-card>								
+					</v-col>				</v-carousel-item>
+			</v-carousel>
 			<v-spacer class="grey lighten-3"></v-spacer> <!-- SPACER HERE !!! -->								
 		</v-row>
         <!-- ■■ taskDialog component ■■ -->
@@ -56,6 +85,14 @@ export default {
 		dialog: {open: false, task: {}, target: {}, del: false},    //Sync data => task dialog component
 	}),
 	computed:{
+        carousel: {
+            get () {
+                return this.$store.state.statetab
+            },
+            set (value) {
+                this.setvxprop({muta: 'statetab', data: value}) 
+            }        
+        },
 		...mapGetters(["logininfo", "tasklist", "seallist"])
 	},
 	methods:{
@@ -64,6 +101,7 @@ export default {
 												&& tk.STATUS == state 													// Sort STATUS
 												&& !this.seallist.includes(tk.SPRINTID) )								// Not Sealed	
 		},
+		...mapActions(["setvxprop"])
 	}
 }
 </script>

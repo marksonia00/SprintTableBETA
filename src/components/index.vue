@@ -10,24 +10,48 @@
 		<div class="ml-4" v-if="subtitle != null">
             {{subtitle}}
         </div>
-		<template v-slot:extension v-if="title.page == 0 || title.page == 1">
-			<v-row class="indigo lighten-1 flex-nowrap">
+		<v-btn  v-if="$vuetify.breakpoint.smAndDown && title.page == 0
+					&& $store.state.subtitle == null"
+				@click="setvxprop({muta: 'addspr', data: true})"
+				color="light-green accent-4" 
+				class="mr-4 white--text" 
+				absolute fab bottom right
+		>
+				<v-icon>mdi-plus</v-icon>
+		</v-btn>
+		<template v-slot:extension 
+				v-if="(title.page == 0 || title.page == 1) &&
+					!($vuetify.breakpoint.smAndDown && title.page == 0
+					&& $store.state.subtitle == null)"> 
+			<v-row class="flex-nowrap"
+				v-if="$vuetify.breakpoint.smAndDown && (title.page == 1
+					|| $store.state.subtitle != null)"> <!-- breakpoint HERE !!! -->
+				 <v-tabs v-model="carousel"	background-color="indigo lighten-1" dark>
+					<v-tab v-for="(state, stid) in mixin.state" :key="stid" :style="{maxWidth: '79px'}">
+						{{state.rwdn}}
+					</v-tab>
+				</v-tabs>
+			</v-row>
+			<v-row 
+				v-if="!$vuetify.breakpoint.smAndDown"
+				class="indigo lighten-1 flex-nowrap"> <!-- breakpoint HERE !!! -->
 				<v-col v-for="(state, stid) in mixin.state" :key="stid" style="max-height: 47px;">
-					<div class="title white--text" style="min-width: 245px; max-width: 245px;">
+					<div class="title white--text" 
+						:style="{minWidth: style.chipwmd, maxWidth: style.chipwmd}">
 						{{state.name}}
 					</div>
 				</v-col>
 				<v-spacer /> <!-- SPACER HERE !!! -->
 			</v-row>
-			<v-tooltip left v-if="title.page == 0">  
+			<v-tooltip left v-if="!$vuetify.breakpoint.smAndDown">  
 				<template v-slot:activator="{ on }">
 					<v-btn v-on="on"
-							@click="setaddspr(true)"
+							@click="setvxprop({muta: 'addspr', data: true})"
 							color="light-green accent-4" 
 							class="mr-4 white--text" 
 							absolute 
 							fab 
-							top 
+							top
 							right>
 							<v-icon>mdi-plus</v-icon>
 					</v-btn>
@@ -37,7 +61,7 @@
 		</template>
     </v-app-bar>
     <!-- ■■■■ Side drawer ■■■■ -->
-    <v-navigation-drawer v-model="drawer" width="141" stateless app>
+    <v-navigation-drawer v-model="drawer" width="141" app :temporary="$vuetify.breakpoint.smAndDown">
 		<template v-slot:prepend>
 			<v-list>
 				<v-list-item>
@@ -75,7 +99,6 @@
 		<!-- ■■■■ Router-View ■■■■ -->
 		<router-view />
 		<!-- ■■■■ Infomation Tag ■■■■  v-model to compute:"isnotify" -->
-					<!-- @input="setnotify({news: false, msg: '', act: null, id: notify.id})" -->
 		<v-snackbar
 			v-model="notify.news" 	
 			:color="notify.act == 0 ? 'success' : (notify.act == 1 ? 'amber darken-3' : 'red')"
@@ -88,7 +111,7 @@
 			<v-btn
 				color="white"
 				text
-				@click="setnotify({news: false, msg: '', act: null, id: notify.id})"
+				@click="setvxlist({muta: 'notify', data: {news: false, msg: '', act: null, id: notify.id}})"
 			>
 				Close
 			</v-btn>
@@ -119,10 +142,19 @@ import mixindata from './mixin/mixindata'
 					{title: 'Sealed', route: 'Seal', icon: 'mdi-package-down'},
 					{title: 'Timeline', route: 'Timeline', icon: 'mdi-progress-clock'}
 				],
+        style: {chipwmd: '245px', chipwsm: '68px'},
 		drawer: true,
 		overlay: false,
 	}), 
 	computed:{
+        carousel: {
+            get () {
+                return this.$store.state.statetab
+            },
+            set (value) {
+                this.setvxprop({muta: 'statetab', data: value}) 
+            }        
+        },
 		...mapGetters(["logininfo", "tasklist", "notify", "addspr", "subtitle"])
 	},
     methods:{
@@ -133,17 +165,18 @@ import mixindata from './mixin/mixindata'
 		},
         // ■■■■ Side drawer router  ■■■■
         listonclick(page){ 
+			this.setvxprop({muta: 'subtitle', data: null})
 			this.$router.push(`/index/${this.navlist[page].route}`)
 		},
 		async initlist(){
 			this.overlay = true
-			this.setnotify({news: false, msg: '', act: null, id: null})
+			this.setvxlist({muta: 'notify', data: {news: false, msg: '', act: null, id: null}})
 			this.bindListRef()
 			await this.gettaskinfo()
 			this.listonclick(0)		
 			this.overlay = false
 		},
-		...mapActions(['_ajaxAction', 'setaddspr', 'setnotify', 'bindListRef', 'unbindListRef', 'gettaskinfo'])
+		...mapActions(['_ajaxAction', 'setvxprop', 'setvxlist', 'bindListRef', 'unbindListRef', 'gettaskinfo'])
 	},
 	created(){
 		this.initlist()	

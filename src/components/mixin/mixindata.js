@@ -5,10 +5,10 @@ export default {
         mixin: {    // static data storage
             member: [],
             state: [
-				{value: 0, name: "to do",   color: "#757575"}, 
-				{value: 1, name: "in process", color: "#0277BD"}, 
-				{value: 2, name: "checking", color: "#FF6D00"}, 
-				{value: 3, name: "done",    color: "#00C853"}, 
+				{value: 0, name: "to do",       rwdn: "to do",     color: "#757575", icon: "mdi-format-list-bulleted"}, 
+				{value: 1, name: "in process",  rwdn: "process",   color: "#0277BD", icon: "mdi-tools"}, 
+				{value: 2, name: "checking",    rwdn: "checking",  color: "#FF6D00", icon: "mdi-message-alert"}, 
+				{value: 3, name: "done",        rwdn: "done",      color: "#00C853", icon: "mdi-checkbox-marked-outline"}, 
 			], 
             prior: [
 				{value: 0, name: 'Highest', color: '#E53935'}, 

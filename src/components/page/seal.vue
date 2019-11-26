@@ -71,7 +71,7 @@ export default {
 			let templist = this.seallist
 			let index = templist.findIndex(sp => sp == spr)
 			templist.splice(index, 1)
-			this.setseallist(templist)
+			this.setvxlist({muta: 'seallist', data: templist})
 		},
 		sprintaction(){ 
             let msg = ''
@@ -85,7 +85,7 @@ export default {
 			}
             this.mixinUpdater('submitTask', {list: templist, id: null}, msg)                     //! => '../mixin/mixindata'
 		},
-		...mapActions(["setseallist"])
+		...mapActions(["setvxlist"])
     },       
 }
 </script>

@@ -6,7 +6,8 @@
                     in (subtitle != null ? [subtitle] 
                         : Array.from(new Set(tasklist.map(task => task.SPRINTID.trim())
                                                     .filter(sp => !seallist.includes(sp) )
-                                                    .sort())))"     :key="spid">
+                                                    .sort())))"     
+                                                    :key="spid">
             <v-col>
                 <!-- ● Title action row ● -->
                 <v-row>
@@ -14,7 +15,7 @@
                     <v-tooltip top v-if="edit.sprint != sprint">  
                         <template v-slot:activator="{ on }">
                             <v-btn text color="grey darken-3" class="title" v-on="on"
-                                @click="subtitle == null ? setsubtitle(sprint) : setsubtitle(null)">
+                                @click="subtitle == null ? setvxprop({muta: 'subtitle', data: sprint}) : setvxprop({muta: 'subtitle', data: null})">
                                 <v-icon v-if="subtitle == null" color="teal darken-2" left>mdi-label</v-icon>
                                 <v-icon v-if="subtitle != null" color="orange darken-2">mdi-arrow-left</v-icon>						
                                 {{sprint}}
@@ -33,7 +34,7 @@
                         <span>check</span>
                     </v-tooltip>
                     <!--● Edit Sprint : open & close ●-->                    
-                    <v-tooltip top>  
+                    <v-tooltip top v-if="!($vuetify.breakpoint.smAndDown && $store.state.subtitle == null)">  
                         <template v-slot:activator="{ on }">
                             <v-btn text icon v-on="on" @click="edit.sprint == null ? edit = {sprint: sprint, value: sprint} : edit.sprint = null">							
                                 <v-icon v-if="edit.sprint != sprint" color="brown darken-1">mdi-pencil</v-icon>
@@ -54,7 +55,7 @@
                         </v-text-field>	
                     </v-card>	
                     <!--● Add task ●-->
-                    <v-tooltip top>  
+                    <v-tooltip top v-if="!($vuetify.breakpoint.smAndDown && $store.state.subtitle == null)">  
                         <template v-slot:activator="{ on }">
                             <v-btn text icon v-on="on"
                                     @click="dialog = {open: true, task: Object.assign({}, mixin.preaddtask), target: sprint, del: false}">
@@ -63,14 +64,14 @@
                         </template>
                         <span>New Task</span>
                     </v-tooltip>
-                    <v-spacer></v-spacer> <!-- SPACER HERE !!!  -->
+                    <v-spacer v-if="!$vuetify.breakpoint.smAndDown"></v-spacer> <!-- SPACER HERE !!!  -->
                     <!--● Seal Sprint ●-->
-                    <v-tooltip top>  
+                    <v-tooltip top v-if="!($vuetify.breakpoint.smAndDown && $store.state.subtitle == null)">  
                         <template v-slot:activator="{ on }">
                             <v-btn icon v-on="on" 
                                 color="orange accent-4" 
                                 class="mr-3 white--text" 
-                                @click="setseallist(seallist.concat([sprint]))"
+                                @click="setvxlist({muta: 'seallist', data: seallist.concat([sprint])})"
                             >
                                 <v-icon>mdi-package-down</v-icon>
                             </v-btn>
@@ -78,7 +79,7 @@
                         <span>Seal</span>
                     </v-tooltip>
                     <!--● Delete Sprint ●-->
-                    <v-tooltip top>  
+                    <v-tooltip top v-if="!($vuetify.breakpoint.smAndDown && $store.state.subtitle == null)">  
                         <template v-slot:activator="{ on }">
                             <v-btn icon v-on="on" @click="dialog = {open: false, task: {SPRINTID: sprint}, target: {STATUS: 'DELETE'}, del: true}"
                                     color="red accent-4" 
@@ -89,16 +90,58 @@
                         <span>Delete</span>
                     </v-tooltip>
                 </v-row>
+                <!-- ● RWD trail ● -->
+                <v-row v-if="$vuetify.breakpoint.smAndDown" no-gutters>
+                    <v-col v-if="subtitle == null"
+                            @click="setvxprop({muta: 'subtitle', data: sprint})">
+                        <v-chip-group >
+                            <v-chip v-for="(state, stid) in mixin.state" :key="stid"
+                                    :color="state.color" outlined>
+                                <v-icon left :color="state.color">{{state.icon}}</v-icon>
+                                {{ taskfilter(sprint, stid).length }}
+                            </v-chip>
+                        </v-chip-group>                    
+                    </v-col>
+                    <v-col v-if="subtitle != null">                    
+                        <v-carousel 
+                            class="grey lighten-3" 
+                            v-model="carousel"
+                            light 
+                            hide-delimiters
+                        >
+                            <v-carousel-item v-for="(state, stid) in mixin.state" :key="stid">
+                                <v-col class="overflow-auto">
+                                    <v-card class="mx-auto" width="257" 
+                                            v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid" 
+                                        @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"
+                                        :style="{borderLeft: `5px ${mixin.prior[task.PRIORITY].color} solid`}">
+                                        <v-list-item dense>
+                                            <v-list-item-content>
+                                                <v-row no-gutters class="overline">
+                                                    <v-col> {{`${task.REMAININGPOINT} / ${task.TOTALPOINT}`}} </v-col>
+                                                    <v-col class="text-right">{{task.OWNER}}</v-col>
+                                                </v-row>
+                                                <v-list-item-title class="body-1">{{task.NAME}}</v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-card>								
+                                </v-col>				                        
+                            </v-carousel-item>
+                        </v-carousel>
+                    </v-col>
+                </v-row>
                 <!-- ● Task row ● -->	
-                <v-row class="flex-nowrap overflow-auto">
-                    <v-col class="grey lighten-3" v-for="(state, stid) in mixin.state" :key="stid"
-                            data-role="drag-drop-container" 
-                            @drop="drop($event, stid, sprint)" 
-                            @dragover.prevent
+                <v-row v-if="!$vuetify.breakpoint.smAndDown" class="flex-nowrap overflow-auto">
+                    <v-col 
+                        v-for="(state, stid) in mixin.state" :key="stid"
+                        class="grey lighten-3" 
+                        data-role="drag-drop-container" 
+                        @drop="drop($event, stid, sprint)" 
+                        @dragover.prevent
                     >
                         <!-- ● inner page : View detail ● -->
                         <v-row v-if="subtitle != null" no-gutters>
-                            <v-col style="min-width: 245px; max-width: 245px;">
+                            <v-col :style="{minWidth: style.chipwmd, maxWidth: style.chipwmd}">
                                 <v-card class="mx-1" v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid" 
                                     hover width="244" 
                                     draggable
@@ -119,16 +162,19 @@
                             </v-col>								
                         </v-row>
                         <!-- ● inner page : Index List ● -->
-                        <v-row v-if="subtitle == null" no-gutters>
-                            <v-col :style="{minWidth: '245px', maxWidth: '245px', maxHeight: '128px', minHeight: '128px'}"
-                                            class="overflow-auto">
+                        <v-row v-if="subtitle == null" no-gutters>  <!-- breakpoint -->
+                            <v-col 
+                                                              
+                                :style="{minWidth: style.chipwmd, maxWidth: style.chipwmd, 
+                                        maxHeight: '128px', minHeight: '128px',}"
+                                        class="overflow-auto">
                                 <v-badge v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid"
                                         overlap 
                                         :color="logininfo.substr(0, 1).toUpperCase() == task.OWNER.substr(0,1).toUpperCase()?
                                                  'indigo' : 'blue-grey lighten-1' " 
                                         :class="{'mt-2': tkid < 1 }"
                                         :style="{opacity: task.OWNER == focus.owner || focus.owner == null ? '1' : '.25',
-                                                maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '88%'}"										
+                                                maxWidth: taskfilter(sprint, stid).length * 2 - 6 > tkid ? '47%' : '88%',}"										
                                         >
                                     <template v-slot:badge>
                                         <v-menu offset-y transition="slide-x-transition">
@@ -175,7 +221,9 @@
                                                 :title="task.NAME"
                                                 @dragstart="dragstart($event, task)"
                                                 @dragend="dragend"	
-                                                @mouseover="isUpdate[task.TASKID.trim()] ? setnotify({news: notify.news, msg: notify.msg, act: notify.act, id: null}) : false"																			
+                                                @mouseover="isUpdate[task.TASKID.trim()] ? 
+                                                            setvxlist({muta: 'notify', data: {news: notify.news, msg: notify.msg, act: notify.act, id: null}})
+                                                             : false"																			
                                                 @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"	
                                             >															
                                                 <span :class="{transitionname: taskfilter(sprint, stid).length * 2 - 6 > tkid}"
@@ -198,7 +246,8 @@
         <!-- ■■ taskDialog component ■■ -->
         <v-dialog 
             v-model="dialog.open" 
-            max-width="600px">
+            max-width="600px"
+            :style="{maxHeight: $vuetify.breakpoint.smAndDown? '373px' : '773px'}">
 			<taskDialog v-bind.sync="dialog" />
 		</v-dialog>
         
@@ -206,7 +255,7 @@
         <v-dialog 
             v-model="addspr" 
             max-width="600px" 
-            @click:outside="setaddspr(false)">
+            @click:outside="setvxprop({muta: 'addspr', data: false})">
 			<sprintDialog v-bind.sync="sprintdialog" />
 		</v-dialog>
 
@@ -237,13 +286,22 @@ import mixindata from '../mixin/mixindata'
     components: { taskDialog, sprintDialog, delDialog },
     mixins: [mixindata],
     data: () => ({
+        style: {chipwmd: '245px', chipwsm: '75px'},
 		focus: {owner: null},
 		dialog: {open: false, task: {}, target: {}, del: false},    //Sync data => task dialog component
 		sprintdialog: {presprint: {}, pretask: [{PRIORITY: 2}]},	//Sync data => sprint dialog component	
-		edit: {sprint: null, value: ''},
+        edit: {sprint: null, value: ''},
 		overlay: false,
 	}), 
 	computed:{
+        carousel: {
+            get () {
+                return this.$store.state.statetab
+            },
+            set (value) {
+                this.setvxprop({muta: 'statetab', data: value}) 
+            }        
+        },
         isUpdate: function(){
             let noti = {}
             noti[this.notify.id] = true 
@@ -269,13 +327,14 @@ import mixindata from '../mixin/mixindata'
                 else if(type == 'delete'){
                     templist.filter(tk => tk.SPRINTID.trim() == this.dialog.task.SPRINTID)
                                     .forEach(ftk => templist.splice(templist.findIndex(tk => tk.TASKID == ftk.TASKID), 1))
-                    msg = `${this.dialog.task.SPRINTID} delete`                    
+                    msg = `${this.dialog.task.SPRINTID} delete` 
+                    this.setvxprop({muta: 'subtitle', data: null})                   
                     this.dialog = {open: false, task: {}, target: {}, del: false}
                 }
                 this.mixinUpdater('submitTask', {list: templist, id: null}, msg)                     //! => '../mixin/mixindata'
             }//hhh
         },       
-		...mapActions(["setaddspr", "setsubtitle", "setseallist", "setnotify"])
+		...mapActions(["setvxprop", "setvxlist"])
 	},
   }
 </script>

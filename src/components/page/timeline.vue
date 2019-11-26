@@ -84,6 +84,7 @@ export default {
 	},
 	methods: {
 		getEventColor: event => event.color,
+		...mapActions(["setvxprop"])
 	}
 }
 

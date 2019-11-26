@@ -21,7 +21,7 @@
 					</v-row>
 					<!-- ● pretask ● -->
 					<v-row v-for="(task, tid) in pretask" :key="tid" dense>
-						<v-col cols="6">                            <!-- Task Name -->
+						<v-col cols="12" md="6">                            <!-- Task Name -->
 							<v-text-field 
 								label="Task Name*" 
 								v-model="task.NAME"
@@ -30,7 +30,7 @@
 								clearable
 							></v-text-field>
 						</v-col>
-						<v-col cols="3">                             <!-- Owner -->
+						<v-col cols="6" md="3">                             <!-- Owner -->
 							<v-select  
 								label="Owner*" 
 								:items="mixin.member" 
@@ -52,7 +52,7 @@
 								</template>									
 							</v-select>									
 						</v-col>
-						<v-col cols="3">                               <!-- Priority -->
+						<v-col cols="6" md="3">                               <!-- Priority -->
 							<v-select label="Priority" 
 										item-text="name"
 										item-value="value"
@@ -76,7 +76,7 @@
 		</v-card-text>
 		<v-card-actions> <!-- dialog actions -->
 			<v-spacer></v-spacer>
-			<v-btn color="blue darken-1" text @click="setaddspr(false)">
+			<v-btn color="blue darken-1" text @click="setvxprop({muta: 'addspr', data: false})">
 					Close
 			</v-btn>
 			<v-btn color="blue darken-1" text @click="Addnewsprint()" :disabled="!rule.valid">
@@ -120,9 +120,9 @@ export default {
 			this.mixinUpdater('submitTask', {list: templist, id: id}, `${this.presprint.NAME} create`)	   //! => '../mixin/mixindata'
 			this.$emit('update:presprint', {})
 			this.$emit('update:pretask', [{PRIORITY: 2}])
-			this.setaddspr(false)
+			this.setvxprop({muta: 'addspr', data: false})
 		},
-		...mapActions(["setaddspr"])
+		...mapActions(["setvxprop"])
 	}
 }
 </script>

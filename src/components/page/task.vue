@@ -24,7 +24,7 @@
 					<v-date-picker range v-model="date.value" no-title scrollable />
 				</v-menu>
 			</v-col>
-			<v-col cols="12" sm="6" md="1">
+			<v-col cols="6" sm="3" md="1">
 				<v-checkbox
 					v-model="done"
 					label="done"
@@ -32,7 +32,7 @@
 					hide-details
 				></v-checkbox>
 			</v-col>
-			<v-col cols="12" sm="6" md="1">
+			<v-col cols="6" sm="3" md="1">
 				<v-text-field
 					:value="pointclac(null)"
 					label="Total"
@@ -45,9 +45,13 @@
 				class="ml-4 pointbox flex-nowrap overflow-auto"
 				@mouseover="focus.point = true" @mouseleave="focus.point = false" 
 				:style="{maxWidth: '677px', 
-						maxHeight: focus.point?'313px':'67px', 
-						padding: focus.point?'1%':'0',
-						border: focus.point?'1px #3949AB solid':'0px #3949AB solid'}">
+						maxHeight: focus.point || $vuetify.breakpoint.smAndDown?'313px':'67px', 
+						padding: focus.point && $vuetify.breakpoint.mdAndUp?'1%':'0',
+						border: focus.point && $vuetify.breakpoint.mdAndUp?'1px #3949AB solid':'0px #3949AB solid',
+						position: $vuetify.breakpoint.mdAndUp?'absolute':'stactic',
+						right: '5%',
+						zIndex: $vuetify.breakpoint.mdAndUp?'100':'0',
+						}">
 					<v-row no-gutters>
 						<v-col
 							v-for="(member, mid) in Array.from(new Set(tasklist.map(task => task.OWNER.trim()).sort()))" 
@@ -180,10 +184,8 @@ import mixindata from '../mixin/mixindata'
 ::-webkit-scrollbar-thumb{ 
     background: #888}
 .pointbox{
-	position: absolute;
-	right: 5%;
+	
 	background-color: #FAFAFA;
-	z-index: 100;
 	transition: all .3s linear 0s;
 }
 </style>
