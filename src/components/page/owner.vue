@@ -3,13 +3,14 @@
 		<v-row	v-if="!$vuetify.breakpoint.smAndDown" 
 				class="flex-nowrap overflow-auto">
 			<v-col  class="grey lighten-3" v-for="(state, stid) in mixin.state" :key="stid"
-					data-role="drag-drop-container" 
+					data-role="drag-drop-container"
+					:style="{minWidth: style.chipwmd, maxWidth: style.chipwmd}" 
 					@drop="drop($event, stid, null)" 
 					@dragover.prevent
 			>
 				<!-- ● inner page : View detail ● -->
 				<v-row no-gutters>
-					<v-col style="min-width: 245px; max-width: 245px;">
+					<v-col :style="{minWidth: style.chipwmd, maxWidth: style.chipwmd}">
 						<v-card class="mx-1" 
 							v-for="(task, tkid) in taskfilter(stid)" 
 							:key="tkid" 
@@ -33,9 +34,8 @@
 				</v-row>
 			</v-col>
 		</v-row>
-		<v-row>
+		<v-row v-if="$vuetify.breakpoint.smAndDown">
 			<v-carousel 
-				v-if="$vuetify.breakpoint.smAndDown"
 				class="grey lighten-3" 
 				v-model="carousel"
 				light 
@@ -82,6 +82,7 @@ export default {
 	source: String,
 	},
 	data: () => ({
+		style: {chipwmd: '270px', chipwsm: '75px'},
 		dialog: {open: false, task: {}, target: {}, del: false},    //Sync data => task dialog component
 	}),
 	computed:{

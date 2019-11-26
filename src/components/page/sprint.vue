@@ -142,7 +142,9 @@
                         <!-- ● inner page : View detail ● -->
                         <v-row v-if="subtitle != null" no-gutters>
                             <v-col :style="{minWidth: style.chipwmd, maxWidth: style.chipwmd}">
-                                <v-card class="mx-1" v-for="(task, tkid) in taskfilter(sprint, stid)" :key="tkid" 
+                                <v-card class="mx-1" 
+                                    v-for="(task, tkid) in taskfilter(sprint, stid)" 
+                                    :key="tkid" 
                                     hover width="244" 
                                     draggable
                                     @click="dialog = {open: true, task: Object.assign({}, task), target: task, del: false}"
