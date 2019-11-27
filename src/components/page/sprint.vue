@@ -108,6 +108,7 @@
                             v-model="carousel"
                             light 
                             hide-delimiters
+                            :style="{maxHeight: '64vh'}"
                         >
                             <v-carousel-item v-for="(state, stid) in mixin.state" :key="stid">
                                 <v-col class="overflow-auto">

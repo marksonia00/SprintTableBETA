@@ -4,13 +4,13 @@
 	<v-app-bar app dense color="indigo darken" class="white--text">
 		<v-app-bar-nav-icon @click="drawer = !drawer" />
 		<v-toolbar-title>
-            {{navlist[title.page].title}}
+            {{navlist[navlist.findIndex(nv => nv.route == $route.name)].title}}
         </v-toolbar-title>
-		<v-icon class="ml-4" v-if="subtitle != null">mdi-chevron-right</v-icon>								
-		<div class="ml-4" v-if="subtitle != null">
+		<v-icon class="ml-4" v-if="$route.name=='Sprint' && subtitle != null">mdi-chevron-right</v-icon>								
+		<div class="ml-4" v-if="$route.name=='Sprint' && subtitle != null">
             {{subtitle}}
         </div>
-		<v-btn  v-if="$vuetify.breakpoint.smAndDown && title.page == 0
+		<v-btn  v-if="$vuetify.breakpoint.smAndDown && $route.name=='Sprint'
 					&& $store.state.subtitle == null"
 				@click="setvxprop({muta: 'addspr', data: true})"
 				color="light-green accent-4" 
@@ -20,11 +20,11 @@
 				<v-icon>mdi-plus</v-icon>
 		</v-btn>
 		<template v-slot:extension 
-				v-if="(title.page == 0 || title.page == 1) &&
-					!($vuetify.breakpoint.smAndDown && title.page == 0
+				v-if="($route.name=='Sprint' || $route.name=='Owner') &&
+					!($vuetify.breakpoint.smAndDown && $route.name=='Sprint'
 					&& $store.state.subtitle == null)"> 
 			<v-row class="flex-nowrap"
-				v-if="$vuetify.breakpoint.smAndDown && (title.page == 1
+				v-if="$vuetify.breakpoint.smAndDown && ($route.name=='Owner'
 					|| $store.state.subtitle != null)"> <!-- breakpoint HERE !!! -->
 				 <v-tabs v-model="carousel"	background-color="indigo lighten-1" dark>
 					<v-tab v-for="(state, stid) in mixin.state" :key="stid" :style="{maxWidth: '79px'}">
@@ -81,9 +81,12 @@
 			</v-list>
 		</template>
       	<v-divider></v-divider>        
-	  	<v-list dense>
+	  	<v-list dense>	<!-- page nav @click="listonclick(i)" -->
 			<v-list-item-group v-model="title.page" color="primary">
-				<v-list-item v-for="(nav, i) in navlist" :key="i" @click="listonclick(i)" :disabled="i == title.page">
+				<v-list-item v-for="(nav, i) in navlist" :key="i" 							 
+							:disabled="navlist[i].route == $route.name"
+							:to="`/index/${navlist[i].route}`"						
+				>
 					<v-list-item-action>
 						<v-icon>{{nav.icon}}</v-icon>
 					</v-list-item-action>
@@ -98,6 +101,14 @@
     <v-content>
 		<!-- ■■■■ Router-View ■■■■ -->
 		<router-view />
+		<v-btn  v-if="$vuetify.breakpoint.smAndDown && subtitle != null && $route.name=='Sprint'"
+				@click="setvxprop({muta: 'subtitle', data: null})"
+				color="deep-orange lighten-1" 
+				class="white--text"  style="left: 7%; bottom: 7%;"
+				absolute fab bottom left
+		>
+				<v-icon>mdi-keyboard-return</v-icon>
+		</v-btn>
 		<!-- ■■■■ Infomation Tag ■■■■  v-model to compute:"isnotify" -->
 		<v-snackbar
 			v-model="notify.news" 	
