@@ -1,7 +1,8 @@
 <template>
 <!-- ■■■■ Task page ■■■■ -->
     <v-container fluid>
-        <v-row no-gutters>
+        <v-row no-gutters>	
+			<!-- ● date-picker ● -->
 			<v-col cols="12" sm="4" md="3">	
 				<v-menu
 					v-model="date.menu"
@@ -24,7 +25,8 @@
 					<v-date-picker range v-model="date.value" no-title scrollable />
 				</v-menu>
 			</v-col>
-			<v-col cols="6" sm="3" md="1">
+			<!-- ● done checker ● -->	
+			<v-col cols="6" sm="3" md="1"> 
 				<v-checkbox
 					v-model="done"
 					label="done"
@@ -32,27 +34,28 @@
 					hide-details
 				></v-checkbox>
 			</v-col>
-			<v-col cols="6" sm="3" md="1">
-				<v-text-field
-					:value="pointclac(null)"
-					label="Total"
-					prepend-icon="mdi-clock"
-					readonly
-					:style="{maxWidth: style.pointwidth, minWidth: style.pointwidth}" 
-				></v-text-field>
-			</v-col>
+			<!-- ● Point Box ● -->
 			<v-col	cols="12" sm="12" md="6"
 				class="ml-4 pointbox flex-nowrap overflow-auto"
 				@mouseover="focus.point = true" @mouseleave="focus.point = false" 
-				:style="{maxWidth: '677px', 
+				:style="{maxWidth: $vuetify.breakpoint.mdAndUp?'53vw':'99vw',  
 						maxHeight: focus.point || $vuetify.breakpoint.smAndDown?'313px':'67px', 
-						padding: focus.point && $vuetify.breakpoint.mdAndUp?'1%':'0',
 						border: focus.point && $vuetify.breakpoint.mdAndUp?'1px #3949AB solid':'0px #3949AB solid',
-						position: $vuetify.breakpoint.mdAndUp?'absolute':'stactic',
-						right: '5%',
-						zIndex: $vuetify.breakpoint.mdAndUp?'100':'0',
+						padding: '0 1%',
+						position: $vuetify.breakpoint.mdAndUp && focus.point?'absolute':'stactic',
+						right: '1%',
+						zIndex: $vuetify.breakpoint.mdAndUp && focus.point?'100':'0',
 						}">
 					<v-row no-gutters>
+						<v-col> 
+							<v-text-field
+								:value="pointclac(null)"
+								label="Total"
+								prepend-icon="mdi-clock"
+								readonly
+								:style="{maxWidth: style.pointwidth, minWidth: style.pointwidth}" 
+							></v-text-field>
+						</v-col>
 						<v-col
 							v-for="(member, mid) in Array.from(new Set(tasklist.map(task => task.OWNER.trim()).sort()))" 
 							:key="mid" 						
@@ -66,6 +69,7 @@
 								:style="{maxWidth: style.pointwidth, minWidth: style.pointwidth, opacity: pointclac(member) != '0 / 0'? '1': '.4'}" 
 							></v-text-field>
 						</v-col>
+						<v-spacer /><v-spacer /><v-spacer /> 
 					</v-row>
 			</v-col>
         </v-row>
