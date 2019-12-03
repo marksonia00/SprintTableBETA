@@ -152,8 +152,8 @@ import mixindata from '../mixin/mixindata'
 		...mapGetters(["tasklist"])
 	},
 	methods:{
-		taskfilter(){
-			let list = this.tasklist.map(tk => {return {...tk, modtimeparse: Date.parse(tk.MODTIME.substr(0, 10))}})
+		taskfilter(){			//todo {...arr, addKeyVal}
+			let list = this.tasklist.map(tk => {return {...tk, modtimeparse: Date.parse(tk.MODTIME.substr(0, 10))}}) //
 			let daterange = this.date.value.map( d => Date.parse(d.split('-').join('/')))
 			daterange[1] ? list = list.filter(tk => !(tk.modtimeparse > Math.max(...daterange)) && !(tk.modtimeparse < Math.min(...daterange)))
 				: list = list.filter(tk => !(tk.modtimeparse > daterange[0]))
